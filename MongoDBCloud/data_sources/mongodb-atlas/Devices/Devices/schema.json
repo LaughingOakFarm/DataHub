@@ -1,0 +1,23 @@
+{
+    "properties": {
+        "DeviceID": {
+            "bsonType": "int"
+        },
+        "LastReading": {
+            "bsonType": "date"
+        },
+        "QueryEvery": {
+            "bsonType": "int"
+        },
+        "Status": {
+            "bsonType": "string"
+        },
+        "Type": {
+            "bsonType": "string"
+        },
+        "_id": {
+            "bsonType": "objectId"
+        }
+    },
+    "title": "Device"
+}

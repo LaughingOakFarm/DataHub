@@ -1,0 +1,11 @@
+{
+    "name": "PersonalAWS",
+    "type": "aws",
+    "config": {
+        "accessKeyId": "AKIA6OM6F2VNAA3N5QFH"
+    },
+    "secret_config": {
+        "secretAccessKey": "RootAWSKey"
+    },
+    "version": 1
+}

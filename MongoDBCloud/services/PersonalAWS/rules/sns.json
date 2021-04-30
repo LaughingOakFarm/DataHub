@@ -1,0 +1,6 @@
+{
+    "name": "sns",
+    "actions": [
+        "sns:*"
+    ]
+}

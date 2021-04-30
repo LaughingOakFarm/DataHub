@@ -1,0 +1,10 @@
+{
+    "id": "608761d0cdf8ed6982dee559",
+    "name": "RunIrrigationZones",
+    "type": "SCHEDULED",
+    "config": {
+        "schedule": "0 */1 * * *"
+    },
+    "function_name": "IrrigationSchedule",
+    "disabled": false
+}
