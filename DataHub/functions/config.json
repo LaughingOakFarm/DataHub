@@ -1,0 +1,30 @@
+[
+    {
+        "name": "SaveData",
+        "private": true
+    },
+    {
+        "name": "DeviceStatuses",
+        "private": false
+    },
+    {
+        "name": "ControlQueue",
+        "private": true
+    },
+    {
+        "name": "DeleteControl",
+        "private": false
+    },
+    {
+        "name": "AddControl",
+        "private": false
+    },
+    {
+        "name": "TempText",
+        "private": true
+    },
+    {
+        "name": "IrrigationSchedule",
+        "private": true
+    }
+]
