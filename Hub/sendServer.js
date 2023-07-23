@@ -165,6 +165,39 @@ function getScheduleCommand(deviceID) {
     return valveLetter;
 }
 
+function getScheduleCommandTest(deviceID) {
+    const date = new Date();
+    const adjustedDay = (date.getDay() - 1 + 7) % 7;
+    const hour = date.getHours();
+
+    // add a leading zero to the hour if needed
+    const time = `${hour < 10 ? '0' : ''}${hour}:00`;
+    const daySchedule = schedule.days[adjustedDay];
+    const minute = date.getMinutes();
+    console.log("Minute: ", minute);
+
+    // every other 7 seconds turn on a different valve
+
+    // if the deviceID is 1, then turn on valve for every other 7 minutes
+    if(deviceID === 1 && [0, 7, 14, 21, 28, 35, 42, 49, 56].includes(minute)) {
+        return 'A';
+    } else if(deviceID == 1 && [1, 8, 15, 22, 29, 36, 43, 50, 57].includes(minute)) {
+        return 'B';
+    } else if(deviceID == 2 && [2, 9, 16, 23, 30, 37, 44, 51, 58].includes(minute)) {
+        return 'A';
+    } else if(deviceID == 2 && [3, 10, 17, 24, 31, 38, 45, 52, 59].includes(minute)) {
+        return 'B';
+    } else if(deviceID == 2 && [4, 11, 18, 25, 32, 39, 46, 53].includes(minute)) {
+        return 'C';
+    } else if(deviceID == 3 && [5, 12, 19, 26, 33, 40, 47, 54].includes(minute)) {
+        return 'B';
+    } else if(deviceID == 4 && [6, 13, 20, 27, 34, 41, 48, 55].includes(minute)) {
+        return 'A';
+    }
+
+    return false;
+}
+
 // Data format: DID=1&TID=-14282&H=50.00&T=69.98&A=1&B=1&C=0
 function parseControllerData(data) {
     const dataObject = {};
@@ -292,7 +325,7 @@ const schedule = {
                 "17:00": "",
                 "18:00": "",
                 "19:00": "1A",
-                "20:00": "1A",
+                "20:00": "3B",
                 "21:00": "1A",
                 "22:00": "1A",
                 "23:00": "3B"
