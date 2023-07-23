@@ -6,14 +6,8 @@ const port = 3000;
 const deviceStates = {
     1: {
         deviceID: 1,
-        temperature: 0,
-        humidity: 0,
+        OK: false,
         desiredValveState: {
-            A: false,
-            B: false,
-            C: false
-        },
-        currentValveState: {
             A: false,
             B: false,
             C: false
@@ -21,14 +15,8 @@ const deviceStates = {
     },
     2: {
         deviceID: 2,
-        temperature: 0,
-        humidity: 0,
+        OK: false,
         desiredValveState: {
-            A: false,
-            B: false,
-            C: false
-        },
-        currentValveState: {
             A: false,
             B: false,
             C: false
@@ -36,14 +24,8 @@ const deviceStates = {
     },
     3: {
         deviceID: 3,
-        temperature: 0,
-        humidity: 0,
+        OK: false,
         desiredValveState: {
-            A: false,
-            B: false,
-            C: false
-        },
-        currentValveState: {
             A: false,
             B: false,
             C: false
@@ -51,14 +33,8 @@ const deviceStates = {
     },
     4: {
         deviceID: 4,
-        temperature: 0,
-        humidity: 0,
+        OK: false,
         desiredValveState: {
-            A: false,
-            B: false,
-            C: false
-        },
-        currentValveState: {
             A: false,
             B: false,
             C: false
@@ -66,6 +42,12 @@ const deviceStates = {
     }
 };
 
+// The Plan
+// 1. Every 10 seconds, send a request to the controller with the desired valve states
+// 2. The controller will respond with DID=[Device ID]&OK=1
+// 3. If the controller does not respond, then send the request again, up to 3 times
+// 4. Go to the next device and repeat
+// 5. If all devices have been sent, then wait 10 seconds and start over
 
 raspi.init(() => {
   let stringData = "";
@@ -86,9 +68,55 @@ raspi.init(() => {
     console.log(`Example app listening on port ${port}`)
   });
   
-  function sendResponse(message) {
+  app.get('/', (req, res) => {
+    res.send('hello world')
+  });
+
+    // send a request for each controller every 10 seconds
+    // get the valve states from the schedule
+    setInterval(async () => {
+        const controllerDeviceIds = Object.keys(deviceStates);
+        for (let i = 0; i < controllerDeviceIds.length; i++) {
+            const deviceID = controllerDeviceIds[i];
+            const deviceState = deviceStates[deviceID];
+            deviceState.desiredValveState = { A: false, B: false, C: false };
+            deviceState.OK = false;
+        
+            const valveState = getScheduleCommand(deviceID);
+            if (valveState) {
+              deviceState.desiredValveState[valveState] = true;
+            }
+        
+            // try 1 times to get a response
+            for (let j = 0; j < 1; j++) {
+              sendMessage(
+                `|${deviceID}${
+                  deviceState.desiredValveState.A ? 1 : 0
+                }${deviceState.desiredValveState.B ? 1 : 0}${
+                  deviceState.desiredValveState.C ? 1 : 0
+                }|`
+              );
+        
+              await sleep(2000);
+        
+              if (deviceState.OK) {
+                console.log("Device " + deviceID + " OK");
+                break;
+              }
+        
+              await sleep(2000);
+              console.log("Device " + deviceID + " not OK, trying again.");
+            }
+
+            await sleep(2000);
+        }
+
+        console.log("---------");
+    }, 40000);
+  
+  function sendMessage(message) {
+    console.log("Sending: ", message);
     serial.write(message);
-    console.log("Response: ", message);
   }
 
   async function collectData(byteArray) {
@@ -98,19 +126,15 @@ raspi.init(() => {
     if(stringData.includes('|')) {
       const commandArray = stringData.split('|');
       const newCommand = commandArray.shift();
+    //   console.log("Full Data: ", newCommand);
       const commandObject = parseControllerData(newCommand);
 
-      if(commandObject) {
-        const deviceID = commandObject.DID;
-        const okCommand = updateDeviceState(commandObject);
-
-        if(okCommand) {
-            await sleep(500);
-            sendResponse(getResponse(deviceID));
+      if(commandObject) {        
+        if(commandObject.OK === '1' && commandObject.DID) {
+            deviceStates[commandObject.DID].OK = true;
         }
       }
-      
-      console.log("Full Data: ", newCommand);
+    
       stringData = commandArray.join('|');
     }
   }
@@ -122,73 +146,64 @@ function sleep(ms) {
   });
 }
 
-// response format 1000
-// 1 = device ID
-// 0 = valve A
-// 0 = valve B
-// 0 = valve C
-// using this schedule, look up the time and return the correct format
-function getResponse(deviceID) {
+function getScheduleCommand(deviceID) {
     const date = new Date();
     const adjustedDay = (date.getDay() - 1 + 7) % 7;
     const hour = date.getHours();
-    const minute = date.getMinutes();
     // add a leading zero to the hour if needed
     const time = `${hour < 10 ? '0' : ''}${hour}:00`;
     const daySchedule = schedule.days[adjustedDay];
-    
-    // is an array of A1, etc
-    // where A is the valve and 1 is the device ID
-    let scheduleData = daySchedule.schedule[time];
-    // console.log("day", daySchedule);
-    if(scheduleData === "") {
-        scheduleData = '--';
-    }
-    console.log("Looking Up: ", daySchedule.name, time);
-    // console.log("Schedule Data: ", scheduleData);
-    const dID = scheduleData[0];
-    let valveLetter = scheduleData[1];
-    if(dID != deviceID) {
-        console.log("Device ID does not match: "+ dID + " != " + deviceID);
-        valveLetter = '-';
-    }
 
-    let valveA = '0';
-    let valveB = '0';
-    let valveC = '0';
-    // if(deviceID == 2) {
-    //     // if the minute is odd then turn on valve A, opposite for valve B
-    //     valveA = minute % 2 === 1 ? '1' : '0';
-    //     valveB = minute % 2 === 0 ? '1' : '0';
-    //     valveC = minute % 2 === 0 ? '1' : '0';
-    // } else {
-        // if valve A is on, the the second charater in the response is 1
-        // if valve B is on, the the third charater in the response is 1
-        // if valve C is on, the the fourth charater in the response is 1
-        valveA = valveLetter === 'A' ? '1' : '0';
-        valveB = valveLetter === 'B' ? '1' : '0';
-        valveC = valveLetter === 'C' ? '1' : '0';
-    // }
-
-    // update the device state
-    const deviceState = deviceStates[deviceID];
-    if(!deviceState) {
-        console.log("Device ID not found: ", deviceID);
+    const scheduleCommand = daySchedule.schedule[time];
+    if(!scheduleCommand) {
         return false;
     }
 
-    deviceState.desiredValveState.A = valveA === '1' ? true : false;
-    deviceState.desiredValveState.B = valveB === '1' ? true : false;
-    deviceState.desiredValveState.C = valveC === '1' ? true : false;
+    const commandDeviceID = scheduleCommand[0];
+    const valveLetter = scheduleCommand[1];
 
-    return `|${deviceID}${valveA}${valveB}${valveC}|`;
+    if(deviceID != commandDeviceID) {
+        return false;
+    }
+
+    return valveLetter;
 }
 
+function getScheduleCommandTest(deviceID) {
+    const date = new Date();
+    const adjustedDay = (date.getDay() - 1 + 7) % 7;
+    const hour = date.getHours();
+
+    // add a leading zero to the hour if needed
+    const time = `${hour < 10 ? '0' : ''}${hour}:00`;
+    const daySchedule = schedule.days[adjustedDay];
+    const minute = date.getMinutes();
+    console.log("Minute: ", minute);
+
+    // every other 7 seconds turn on a different valve
+
+    // if the deviceID is 1, then turn on valve for every other 7 minutes
+    if(deviceID === 1 && [0, 7, 14, 21, 28, 35, 42, 49, 56].includes(minute)) {
+        return 'A';
+    } else if(deviceID == 1 && [1, 8, 15, 22, 29, 36, 43, 50, 57].includes(minute)) {
+        return 'B';
+    } else if(deviceID == 2 && [2, 9, 16, 23, 30, 37, 44, 51, 58].includes(minute)) {
+        return 'A';
+    } else if(deviceID == 2 && [3, 10, 17, 24, 31, 38, 45, 52, 59].includes(minute)) {
+        return 'B';
+    } else if(deviceID == 2 && [4, 11, 18, 25, 32, 39, 46, 53].includes(minute)) {
+        return 'C';
+    } else if(deviceID == 3 && [5, 12, 19, 26, 33, 40, 47, 54].includes(minute)) {
+        return 'B';
+    } else if(deviceID == 4 && [6, 13, 20, 27, 34, 41, 48, 55].includes(minute)) {
+        return 'A';
+    }
+
+    return false;
+}
 
 // Data format: DID=1&TID=-14282&H=50.00&T=69.98&A=1&B=1&C=0
 function parseControllerData(data) {
-    if(data === "OK") return false;
-
     const dataObject = {};
     const dataArray = data.split('&');
     dataArray.forEach((item) => {
@@ -197,43 +212,6 @@ function parseControllerData(data) {
     });
     
     return dataObject;
-}
-
-function updateDeviceState(data) {
-    console.log("Updating Device State: ", data);
-    const goodKeys = [
-        "DID",
-        "TID",
-        "H",
-        "T",
-        "A",
-        "B",
-        "C"
-    ];
-    // check to make sure all the keys are there
-    let dataIsGood = true;
-    goodKeys.forEach((key) => {
-        if(!data[key]) {
-            console.log("Missing Key: ", key);
-            dataIsGood = false;
-        }
-    });
-    if(!dataIsGood) {
-        console.log("Bad Data: ", data);
-        return false;
-    }
-
-    const deviceID = data.DID;
-    const deviceState = deviceStates[deviceID];
-    deviceState.temperature = data.T;
-    deviceState.humidity = data.H;
-    deviceState.currentValveState.A = data.A === '1' ? true : false;
-    deviceState.currentValveState.B = data.B === '1' ? true : false;
-    deviceState.currentValveState.C = data.C === '1' ? true : false;
-
-    console.log("Device State: ", deviceState);
-
-    return true;
 }
 
 // Add an event listener for uncaught exceptions
@@ -302,7 +280,7 @@ const schedule = {
         {
             name: "Monday",
             schedule: {
-                "00:00": "1B",
+                "00:00": "3B",
                 "01:00": "2A",
                 "02:00": "1B",
                 "03:00": "2A",
@@ -317,8 +295,8 @@ const schedule = {
                 "12:00": "",
                 "13:00": "",
                 "14:00": "",
-                "15:00": "",
-                "16:00": "",
+                "15:00": "4A",
+                "16:00": "4A",
                 "17:00": "",
                 "18:00": "",
                 "19:00": "2C",
@@ -346,22 +324,22 @@ const schedule = {
                 "12:00": "",
                 "13:00": "",
                 "14:00": "",
-                "15:00": "4A",
-                "16:00": "3B",
-                "17:00": "",
-                "18:00": "",
+                "15:00": "",
+                "16:00": "",
+                "17:00": "3B",
+                "18:00": "3B",
                 "19:00": "1A",
                 "20:00": "1A",
                 "21:00": "1A",
                 "22:00": "1A",
-                "23:00": ""
+                "23:00": "3B"
             }
             
         },
         {
             name: "Wednesday",
             schedule: {
-                "00:00": "",
+                "00:00": "3B",
                 "01:00": "1A",
                 "02:00": "1A",
                 "03:00": "1A",
@@ -376,14 +354,14 @@ const schedule = {
                 "12:00": "",
                 "13:00": "",
                 "14:00": "",
-                "15:00": "",
-                "16:00": "",
+                "15:00": "4A",
+                "16:00": "4A",
                 "17:00": "",
                 "18:00": "",
-                "19:00": "3A",
-                "20:00": "3A",
-                "21:00": "3A",
-                "22:00": "3A",
+                "19:00": "3B",
+                "20:00": "1B",
+                "21:00": "1B",
+                "22:00": "1B",
                 "23:00": "3A"
             }
         },
@@ -405,10 +383,10 @@ const schedule = {
                 "12:00": "",
                 "13:00": "",
                 "14:00": "",
-                "15:00": "4A",
-                "16:00": "3B",
+                "15:00": "",
+                "16:00": "",
                 "17:00": "",
-                "18:00": "",
+                "18:00": "3B",
                 "19:00": "2A",
                 "20:00": "1B",
                 "21:00": "2A",
@@ -419,7 +397,7 @@ const schedule = {
         {
             name: "Friday",
             schedule: {
-                "00:00": "1B",
+                "00:00": "3B",
                 "01:00": "2A",
                 "02:00": "1B",
                 "03:00": "2A",
@@ -434,65 +412,50 @@ const schedule = {
                 "12:00": "",
                 "13:00": "",
                 "14:00": "",
-                "15:00": "",
-                "16:00": "",
+                "15:00": "4A",
+                "16:00": "4A",
                 "17:00": "",
                 "18:00": "",
-
-                "19:00": "1B",
-                "20:00": "1B",
-                "21:00": "1B",
-                "22:00": "1B",
-                "23:00": "1B"
-                // "19:00": "2C",
-                // "20:00": "2B",
-                // "21:00": "2C",
-                // "22:00": "2B",
-                // "23:00": "2C"
+                "19:00": "2C",
+                "20:00": "2B",
+                "21:00": "2C",
+                "22:00": "2B",
+                "23:00": "2C"
             }
         },
         {
             name: "Saturday",
             schedule: {
-                // "00:00": "2B",
-                // "01:00": "2C",
-                // "02:00": "2B",
-                // "03:00": "2C",
-                // "04:00": "2B",
-                // "05:00": "2C",
-                // "06:00": "2B",
-                // "07:00": "3A",
-                // "08:00": "3A",
-                "00:00": "1B",
-                "01:00": "1B",
-                "02:00": "1B",
-                "03:00": "1B",
-                "04:00": "1B",
-                "05:00": "1B",
-                "06:00": "1B",
-                "07:00": "1B",
-                "08:00": "1B",
-                "09:00": "2C",
+                "00:00": "2B",
+                "01:00": "2C",
+                "02:00": "2B",
+                "03:00": "2C",
+                "04:00": "2B",
+                "05:00": "2C",
+                "06:00": "2B",
+                "07:00": "",
+                "08:00": "",
+                "09:00": "",
                 "10:00": "",
                 "11:00": "",
                 "12:00": "",
                 "13:00": "",
                 "14:00": "",
                 "15:00": "4A",
-                "16:00": "4A", // 3B
+                "16:00": "4A",
                 "17:00": "",
                 "18:00": "",
                 "19:00": "1A",
                 "20:00": "1A",
                 "21:00": "1A",
                 "22:00": "1A",
-                "23:00": ""
+                "23:00": "3B"
             }
         },
         {
             name: "Sunday",
             schedule: {
-                "00:00": "",
+                "00:00": "3B",
                 "01:00": "1A",
                 "02:00": "1A",
                 "03:00": "1A",
@@ -507,10 +470,10 @@ const schedule = {
                 "12:00": "",
                 "13:00": "",
                 "14:00": "",
-                "15:00": "4A",
-                "16:00": "3B",
-                "17:00": "",
-                "18:00": "",
+                "15:00": "",
+                "16:00": "",
+                "17:00": "3B",
+                "18:00": "1B",
                 "19:00": "2A",
                 "20:00": "1B",
                 "21:00": "2A",
@@ -520,3 +483,4 @@ const schedule = {
         }
     ]
 }; 
+
