@@ -42,35 +42,28 @@ const deviceStates = {
     }
 };
 
-// The Plan
-// 1. Every 10 seconds, send a request to the controller with the desired valve states
-// 2. The controller will respond with DID=[Device ID]&OK=1
-// 3. If the controller does not respond, then send the request again, up to 3 times
-// 4. Go to the next device and repeat
-// 5. If all devices have been sent, then wait 10 seconds and start over
-
 raspi.init(() => {
-  let stringData = "";
-  
-  const serial = new Serial({
-      portId: "/dev/ttyS0",
-      baudRate: 9600,
-      parity: Serial.PARITY_NONE 
-  });
-  
-  serial.open(() => {
-    serial.on('data', (data) => {
-      collectData(data);
+    let stringData = "";
+
+    const serial = new Serial({
+        portId: "/dev/ttyS0",
+        baudRate: 9600,
+        parity: Serial.PARITY_NONE
     });
-  });
-  
-  app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-  });
-  
-  app.get('/', (req, res) => {
-    res.send('hello world')
-  });
+
+    serial.open(() => {
+        serial.on('data', (data) => {
+            collectData(data);
+        });
+    });
+
+    app.listen(port, () => {
+        console.log(`Example app listening on port ${port}`)
+    });
+
+    app.get('/', (req, res) => {
+        res.send('hello world')
+    });
 
     // send a request for each controller every 10 seconds
     // get the valve states from the schedule
@@ -81,31 +74,29 @@ raspi.init(() => {
             const deviceState = deviceStates[deviceID];
             deviceState.desiredValveState = { A: false, B: false, C: false };
             deviceState.OK = false;
-        
+
             const valveState = getScheduleCommand(deviceID);
             if (valveState) {
-              deviceState.desiredValveState[valveState] = true;
+                deviceState.desiredValveState[valveState] = true;
             }
-        
+
             // try 1 times to get a response
             for (let j = 0; j < 1; j++) {
-              sendMessage(
-                `|${deviceID}${
-                  deviceState.desiredValveState.A ? 1 : 0
-                }${deviceState.desiredValveState.B ? 1 : 0}${
-                  deviceState.desiredValveState.C ? 1 : 0
-                }|`
-              );
-        
-              await sleep(2000);
-        
-              if (deviceState.OK) {
-                console.log("Device " + deviceID + " OK");
-                break;
-              }
-        
-              await sleep(2000);
-              console.log("Device " + deviceID + " not OK, trying again.");
+                sendMessage(
+                    `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0
+                    }${deviceState.desiredValveState.B ? 1 : 0}${deviceState.desiredValveState.C ? 1 : 0
+                    }|`
+                );
+
+                await sleep(2000);
+
+                if (deviceState.OK) {
+                    console.log("Device " + deviceID + " OK");
+                    break;
+                }
+
+                await sleep(2000);
+                console.log("Device " + deviceID + " not OK, trying again.");
             }
 
             await sleep(2000);
@@ -113,37 +104,36 @@ raspi.init(() => {
 
         console.log("---------");
     }, 40000);
-  
-  function sendMessage(message) {
-    console.log("Sending: ", message);
-    serial.write(message);
-  }
 
-  async function collectData(byteArray) {
-    const byteString = String.fromCharCode(...byteArray);
-    stringData += byteString;
-        
-    if(stringData.includes('|')) {
-      const commandArray = stringData.split('|');
-      const newCommand = commandArray.shift();
-    //   console.log("Full Data: ", newCommand);
-      const commandObject = parseControllerData(newCommand);
-
-      if(commandObject) {        
-        if(commandObject.OK === '1' && commandObject.DID) {
-            deviceStates[commandObject.DID].OK = true;
-        }
-      }
-    
-      stringData = commandArray.join('|');
+    function sendMessage(message) {
+        console.log("Sending: ", message);
+        serial.write(message);
     }
-  }
+
+    async function collectData(byteArray) {
+        const byteString = String.fromCharCode(...byteArray);
+        stringData += byteString;
+
+        if (stringData.includes('|')) {
+            const commandArray = stringData.split('|');
+            const newCommand = commandArray.shift();
+            const commandObject = parseControllerData(newCommand);
+
+            if (commandObject) {
+                if (commandObject.OK === '1' && commandObject.DID) {
+                    deviceStates[commandObject.DID].OK = true;
+                }
+            }
+
+            stringData = commandArray.join('|');
+        }
+    }
 });
 
 function sleep(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
+    return new Promise((resolve) => {
+        setTimeout(resolve, ms);
+    });
 }
 
 function getScheduleCommand(deviceID) {
@@ -155,14 +145,14 @@ function getScheduleCommand(deviceID) {
     const daySchedule = schedule.days[adjustedDay];
 
     const scheduleCommand = daySchedule.schedule[time];
-    if(!scheduleCommand) {
+    if (!scheduleCommand) {
         return false;
     }
 
     const commandDeviceID = scheduleCommand[0];
     const valveLetter = scheduleCommand[1];
 
-    if(deviceID != commandDeviceID) {
+    if (deviceID != commandDeviceID) {
         return false;
     }
 
@@ -183,19 +173,19 @@ function getScheduleCommandTest(deviceID) {
     // every other 7 seconds turn on a different valve
 
     // if the deviceID is 1, then turn on valve for every other 7 minutes
-    if(deviceID === 1 && [0, 7, 14, 21, 28, 35, 42, 49, 56].includes(minute)) {
+    if (deviceID === 1 && [0, 7, 14, 21, 28, 35, 42, 49, 56].includes(minute)) {
         return 'A';
-    } else if(deviceID == 1 && [1, 8, 15, 22, 29, 36, 43, 50, 57].includes(minute)) {
+    } else if (deviceID == 1 && [1, 8, 15, 22, 29, 36, 43, 50, 57].includes(minute)) {
         return 'B';
-    } else if(deviceID == 2 && [2, 9, 16, 23, 30, 37, 44, 51, 58].includes(minute)) {
+    } else if (deviceID == 2 && [2, 9, 16, 23, 30, 37, 44, 51, 58].includes(minute)) {
         return 'A';
-    } else if(deviceID == 2 && [3, 10, 17, 24, 31, 38, 45, 52, 59].includes(minute)) {
+    } else if (deviceID == 2 && [3, 10, 17, 24, 31, 38, 45, 52, 59].includes(minute)) {
         return 'B';
-    } else if(deviceID == 2 && [4, 11, 18, 25, 32, 39, 46, 53].includes(minute)) {
+    } else if (deviceID == 2 && [4, 11, 18, 25, 32, 39, 46, 53].includes(minute)) {
         return 'C';
-    } else if(deviceID == 3 && [5, 12, 19, 26, 33, 40, 47, 54].includes(minute)) {
+    } else if (deviceID == 3 && [5, 12, 19, 26, 33, 40, 47, 54].includes(minute)) {
         return 'B';
-    } else if(deviceID == 4 && [6, 13, 20, 27, 34, 41, 48, 55].includes(minute)) {
+    } else if (deviceID == 4 && [6, 13, 20, 27, 34, 41, 48, 55].includes(minute)) {
         return 'A';
     }
 
@@ -210,7 +200,7 @@ function parseControllerData(data) {
         const itemArray = item.split('=');
         dataObject[itemArray[0]] = itemArray[1];
     });
-    
+
     return dataObject;
 }
 
@@ -226,49 +216,49 @@ process.on('uncaughtException', (error) => {
 // schedule of when to turn on each valve
 const schedule = {
     zones: {
-        "1A":{
+        "1A": {
             name: "Girls Zone (5)",
             type: "pasture",
             deviceID: 1,
             valve: "A",
         },
-        "1B":{
+        "1B": {
             name: "Pond Zone (3)",
             type: "pasture",
             deviceID: 1,
             valve: "B",
         },
-        "2A":{
+        "2A": {
             name: "Oak Zone (4)",
             type: "pasture",
             deviceID: 2,
             valve: "A",
         },
-        "2B":{
+        "2B": {
             name: "Boys Zone (3)",
             type: "pasture",
             deviceID: 2,
             valve: "B",
         },
-        "2C":{
+        "2C": {
             name: "Bottom Zone (4)",
             type: "pasture",
             deviceID: 2,
             valve: "C",
         },
-        "3A":{
+        "3A": {
             name: "Pond Fill (1)",
             type: "pond",
             deviceID: 3,
             valve: "A",
         },
-        "3B":{
+        "3B": {
             name: "Pond Path (2)",
             type: "lawn",
             deviceID: 3,
             valve: "B",
         },
-        "4A":{
+        "4A": {
             name: "Lawn (5)",
             type: "lawn",
             deviceID: 4,
@@ -334,7 +324,7 @@ const schedule = {
                 "22:00": "1A",
                 "23:00": "3B"
             }
-            
+
         },
         {
             name: "Wednesday",
@@ -385,8 +375,8 @@ const schedule = {
                 "14:00": "",
                 "15:00": "",
                 "16:00": "",
-                "17:00": "",
-                "18:00": "3B",
+                "17:00": "3B",
+                "18:00": "1B",
                 "19:00": "2A",
                 "20:00": "1B",
                 "21:00": "2A",
@@ -482,5 +472,5 @@ const schedule = {
             }
         }
     ]
-}; 
+};
 
