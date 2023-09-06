@@ -1,4 +1,4 @@
-export const deviceStates = {
+const deviceStates = {
     1: {
         deviceID: 1,
         OK: false,
