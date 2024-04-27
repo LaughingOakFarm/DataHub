@@ -9,8 +9,7 @@ const deviceStates = {
         OK: false,
         desiredValveState: {
             A: false,
-            B: false,
-            C: false
+            B: false
         }
     },
     2: {
@@ -18,8 +17,7 @@ const deviceStates = {
         OK: false,
         desiredValveState: {
             A: false,
-            B: false,
-            C: false
+            B: false
         }
     },
     3: {
@@ -27,8 +25,7 @@ const deviceStates = {
         OK: false,
         desiredValveState: {
             A: false,
-            B: false,
-            C: false
+            B: false
         }
     },
     4: {
@@ -36,8 +33,7 @@ const deviceStates = {
         OK: false,
         desiredValveState: {
             A: false,
-            B: false,
-            C: false
+            B: false
         }
     }
 };
@@ -79,7 +75,7 @@ raspi.init(() => {
         for (let i = 0; i < controllerDeviceIds.length; i++) {
             const deviceID = controllerDeviceIds[i];
             const deviceState = deviceStates[deviceID];
-            deviceState.desiredValveState = { A: false, B: false, C: false };
+            deviceState.desiredValveState = { A: false, B: false };
             deviceState.OK = false;
         
             const valveState = getScheduleCommand(deviceID);
@@ -92,9 +88,7 @@ raspi.init(() => {
               sendMessage(
                 `|${deviceID}${
                   deviceState.desiredValveState.A ? 1 : 0
-                }${deviceState.desiredValveState.B ? 1 : 0}${
-                  deviceState.desiredValveState.C ? 1 : 0
-                }|`
+                }${deviceState.desiredValveState.B ? 1 : 0}|`
               );
         
               await sleep(2000);
@@ -191,8 +185,6 @@ function getScheduleCommandTest(deviceID) {
         return 'A';
     } else if(deviceID == 2 && [3, 10, 17, 24, 31, 38, 45, 52, 59].includes(minute)) {
         return 'B';
-    } else if(deviceID == 2 && [4, 11, 18, 25, 32, 39, 46, 53].includes(minute)) {
-        return 'C';
     } else if(deviceID == 3 && [5, 12, 19, 26, 33, 40, 47, 54].includes(minute)) {
         return 'B';
     } else if(deviceID == 4 && [6, 13, 20, 27, 34, 41, 48, 55].includes(minute)) {
@@ -202,7 +194,7 @@ function getScheduleCommandTest(deviceID) {
     return false;
 }
 
-// Data format: DID=1&TID=-14282&H=50.00&T=69.98&A=1&B=1&C=0
+// Data format: DID=1&TID=-14282&H=50.00&T=69.98&A=1&B=1
 function parseControllerData(data) {
     const dataObject = {};
     const dataArray = data.split('&');
@@ -250,12 +242,6 @@ const schedule = {
             deviceID: 2,
             valve: "B",
         },
-        "2C":{
-            name: "Bottom Zone (4)",
-            type: "pasture",
-            deviceID: 2,
-            valve: "C",
-        },
         "3A":{
             name: "Pond Fill (1)",
             type: "pond",
@@ -297,11 +283,11 @@ const schedule = {
                 "14:00": "",
                 "15:00": "4A",
                 "16:00": "4A",
-                "17:00": "",
-                "18:00": "",
-                "19:00": "2C",
+                "17:00": "1B",
+                "18:00": "1B",
+                "19:00": "",
                 "20:00": "2B",
-                "21:00": "2C",
+                "21:00": "1A",
                 "22:00": "2B",
                 "23:00": "3B"
             }
@@ -310,11 +296,11 @@ const schedule = {
             name: "Tuesday",
             schedule: {
                 "00:00": "2B",
-                "01:00": "2C",
+                "01:00": "1A",
                 "02:00": "2B",
-                "03:00": "2C",
+                "03:00": "1A",
                 "04:00": "2B",
-                "05:00": "2C",
+                "05:00": "1A",
                 "06:00": "2B",
                 "07:00": "3A",
                 "08:00": "3A",
@@ -359,10 +345,10 @@ const schedule = {
                 "17:00": "",
                 "18:00": "",
                 "19:00": "3B",
-                "20:00": "",
-                "21:00": "",
-                "22:00": "",
-                "23:00": ""
+                "20:00": "1B",
+                "21:00": "1B",
+                "22:00": "1B",
+                "23:00": "1B"
             }
         },
         {
@@ -416,11 +402,11 @@ const schedule = {
                 "16:00": "4A",
                 "17:00": "",
                 "18:00": "",
-                "19:00": "1B",
+                "19:00": "",
                 "20:00": "1A",
-                "21:00": "2C",
+                "21:00": "",
                 "22:00": "1A",
-                "23:00": "2C"
+                "23:00": ""
             }
         },
         {
@@ -445,7 +431,7 @@ const schedule = {
                 "16:00": "4A",
                 "17:00": "",
                 "18:00": "",
-                "19:00": "1A",
+                "19:00": "",
                 "20:00": "1A",
                 "21:00": "1A",
                 "22:00": "1A",
