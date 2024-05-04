@@ -9,6 +9,11 @@ import { ZoneID, zones } from "./Zones";
 
 const app = express()
 const port = 3000;
+
+if (!fs.existsSync("schedule.json")) {
+    saveScheduleFile(emptySchedule);
+}
+
 const currentSchedule = fs.readFileSync("schedule.json", "utf8");
 
 raspi.init(() => {

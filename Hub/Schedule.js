@@ -45,6 +45,9 @@ const EmptySchedule_1 = require("./EmptySchedule");
 const Zones_1 = require("./Zones");
 const app = (0, express_1.default)();
 const port = 3000;
+if (!fs_1.default.existsSync("schedule.json")) {
+    saveScheduleFile(EmptySchedule_1.emptySchedule);
+}
 const currentSchedule = fs_1.default.readFileSync("schedule.json", "utf8");
 raspi.init(() => {
     let stringData = "";
