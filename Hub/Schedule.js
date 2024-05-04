@@ -48,7 +48,8 @@ const port = 3000;
 if (!fs_1.default.existsSync("schedule.json")) {
     saveScheduleFile(EmptySchedule_1.emptySchedule);
 }
-const currentSchedule = fs_1.default.readFileSync("schedule.json", "utf8");
+const currentScheduleRaw = fs_1.default.readFileSync("schedule.json", "utf8");
+const currentSchedule = JSON.parse(currentScheduleRaw) || EmptySchedule_1.emptySchedule;
 raspi.init(() => {
     let stringData = "";
     let serial;
@@ -112,7 +113,7 @@ raspi.init(() => {
             res.send("Zone is required and must be a valid zone");
             return;
         }
-        const schedule = JSON.parse(currentSchedule);
+        const schedule = currentSchedule;
         const daySchedule = schedule[day.toString()];
         const hourSchedule = daySchedule.schedule[time.toString()];
         if (isDefault) {

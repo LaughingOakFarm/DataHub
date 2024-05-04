@@ -14,7 +14,8 @@ if (!fs.existsSync("schedule.json")) {
     saveScheduleFile(emptySchedule);
 }
 
-const currentSchedule = fs.readFileSync("schedule.json", "utf8");
+const currentScheduleRaw = fs.readFileSync("schedule.json", "utf8");
+const currentSchedule: ISchedule = JSON.parse(currentScheduleRaw) || emptySchedule;
 
 raspi.init(() => {
     let stringData = "";
@@ -92,7 +93,7 @@ raspi.init(() => {
             return;
         }
 
-        const schedule = JSON.parse(currentSchedule) as ISchedule;
+        const schedule = currentSchedule;
         const daySchedule = schedule[day.toString() as DayID];
         const hourSchedule = daySchedule.schedule[time.toString() as TimeID];
 
