@@ -99,7 +99,7 @@ raspi.init(() => {
               }
         
               await sleep(2000);
-              console.log("Device " + deviceID + " not OK, trying again.");
+              console.log("Device " + deviceID + " not OK.");
             }
 
             await sleep(2000);
