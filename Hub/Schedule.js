@@ -46,10 +46,6 @@ const Zones_1 = require("./Zones");
 const app = (0, express_1.default)();
 const cors = require('cors');
 app.use(cors());
-app.options('*', cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
-}));
 const port = 3000;
 if (!fs_1.default.existsSync("schedule.json")) {
     saveScheduleFile(EmptySchedule_1.emptySchedule);

@@ -10,10 +10,6 @@ import { ZoneID, zones } from "./Zones";
 const app = express()
 const cors = require('cors');
 app.use(cors());
-app.options('*', cors({
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
-}));
 const port = 3000;
 
 if (!fs.existsSync("schedule.json")) {
