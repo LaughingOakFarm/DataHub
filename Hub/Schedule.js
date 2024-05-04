@@ -73,6 +73,9 @@ raspi.init(() => {
     app.get('/', (req, res) => {
         res.send('hello world');
     });
+    app.get('/deviceStates', (req, res) => {
+        res.send(DeviceStates_1.deviceStates);
+    });
     // send a request for each controller every 10 seconds
     // get the valve states from the schedule
     setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
