@@ -8,6 +8,9 @@ import { ISchedule, emptySchedule, DayID, TimeID } from "./EmptySchedule";
 import { ZoneID, zones } from "./Zones";
 
 const app = express()
+const cors = require('cors');
+app.use(cors());
+app.options('*', cors());
 const port = 3000;
 
 if (!fs.existsSync("schedule.json")) {
