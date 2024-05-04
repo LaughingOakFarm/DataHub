@@ -200,8 +200,8 @@ function saveScheduleFile(schedule) {
             console.error(err);
             return;
         }
-        console.log("Schedule saved");
     });
+    console.log("Schedule saved");
 }
 function removeExpiredOverrides() {
     const date = new Date();

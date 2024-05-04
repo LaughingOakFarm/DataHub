@@ -203,9 +203,9 @@ function saveScheduleFile(schedule: ISchedule) {
             console.error(err);
             return;
         }
-
-        console.log("Schedule saved");
     });
+
+    console.log("Schedule saved");
 }
 
 function removeExpiredOverrides() {
