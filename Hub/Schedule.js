@@ -19,7 +19,7 @@ const DeviceStates_1 = require("./DeviceStates");
 const MockSerial_1 = require("./MockSerial");
 const app = (0, express_1.default)();
 const port = 3000;
-raspi_1.default.init(() => {
+raspi_1.init(() => {
     let stringData = "";
     let serial;
     if (require('os').platform() === 'linux' && (require('os').arch() === 'arm' || require('os').arch() === 'arm64')) {
