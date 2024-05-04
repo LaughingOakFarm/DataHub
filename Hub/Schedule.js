@@ -191,13 +191,16 @@ function sleep(ms) {
     });
 }
 function saveScheduleFile(schedule) {
+    if (schedule === currentSchedule) {
+        return;
+    }
     currentSchedule = schedule;
     fs_1.default.writeFile("schedule.json", JSON.stringify(schedule), (err) => {
         if (err) {
             console.error(err);
             return;
         }
-        console.log("File has been updated");
+        console.log("Schedule saved");
     });
 }
 function removeExpiredOverrides() {

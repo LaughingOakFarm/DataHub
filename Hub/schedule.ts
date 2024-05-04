@@ -192,6 +192,10 @@ function sleep(ms: number) {
 }
 
 function saveScheduleFile(schedule: ISchedule) {
+    if(schedule === currentSchedule) {
+        return;
+    }
+
     currentSchedule = schedule;
 
     fs.writeFile("schedule.json", JSON.stringify(schedule), (err) => {
@@ -199,7 +203,8 @@ function saveScheduleFile(schedule: ISchedule) {
             console.error(err);
             return;
         }
-        console.log("File has been updated");
+
+        console.log("Schedule saved");
     });
 }
 
