@@ -76,10 +76,10 @@ raspi.init(() => {
         });
     });
     app.listen(port, () => {
-        console.log(`Example app listening on port ${port}`);
+        console.log(`Listening on port ${port}`);
     });
     app.get('/', (req, res) => {
-        res.send('hello world');
+        res.send('OK');
     });
     app.get('/deviceStates', (req, res) => {
         res.send(DeviceStates_1.deviceStates);
@@ -187,7 +187,7 @@ function saveScheduleFile(schedule) {
             console.error(err);
             return;
         }
-        console.log("File has been created");
+        console.log("File has been updated");
     });
 }
 function getScheduleCommand(deviceID) {

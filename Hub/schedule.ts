@@ -46,11 +46,11 @@ raspi.init(() => {
     });
 
     app.listen(port, () => {
-        console.log(`Example app listening on port ${port}`)
+        console.log(`Listening on port ${port}`)
     });
 
     app.get('/', (req, res) => {
-        res.send('hello world')
+        res.send('OK')
     });
 
     app.get('/deviceStates', (req, res) => {
@@ -185,7 +185,7 @@ function saveScheduleFile(schedule: ISchedule) {
             console.error(err);
             return;
         }
-        console.log("File has been created");
+        console.log("File has been updated");
     });
 }
 
