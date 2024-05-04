@@ -1,5 +1,5 @@
 const { overrideSchedule } = require('./common.js');
-const schedule = require('./schedule.js').schedule;
+const schedule = require('../schedule.js').schedule;
 const activeSchedule = { ...schedule };
 
 

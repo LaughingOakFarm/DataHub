@@ -4,7 +4,7 @@ const Serial = require('raspi-serial').Serial;
 const express = require('express');
 const app = express()
 const port = 3000;
-const normalSchedule = require('./schedule.js').schedule;
+const normalSchedule = require('../schedule.js').schedule;
 const { overrideSchedule, sleep, getScheduleCommand, parseControllerData, resetScheduleAtMidnight } = require('./common.js');
 
 const activeSchedule = { ...normalSchedule };
