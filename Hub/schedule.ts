@@ -1,43 +1,80 @@
-"use strict";
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-const raspi_1 = __importDefault(require("raspi"));
-const express_1 = __importDefault(require("express"));
-class MockSerial {
-    constructor(options) {
-        this.options = options;
+import raspi from 'raspi';
+import express from 'express';
+
+interface ISerialOptions {
+    portId: string;
+    baudRate: number;
+    parity: string;
+}
+
+interface ISerial {
+    open(callback: (error: any) => void): void;
+    write(data: string, callback?: (error: any) => void): void;
+    close(callback: (error: any) => void): void;
+    on(event: string, callback?: (data: any) => void): void;
+}
+
+
+type ISchedules = IDay[];
+
+interface IDay {
+    name: string;
+    schedule: Record<string, IScheduleHour>;
+}
+
+interface IScheduleHour {
+    default: string[];
+    overrides: string[];
+}
+
+interface IZone {
+    name: string;
+    type: string;
+    deviceID: number;
+    valve: string;
+}
+
+interface IDeviceStates {
+    [key: string]: IDeviceState;
+}
+
+interface IDeviceState {
+    deviceID: string;
+    OK: boolean;
+    desiredValveState: {
+        A: boolean;
+        B: boolean;
+    };
+}
+
+class MockSerial implements ISerial {
+    constructor(private options: ISerialOptions) {
         console.log(`MockSerial initialized with portId ${options.portId} and baudRate ${options.baudRate}`);
     }
-    open(callback) {
+
+    open(callback: (error: any) => void): void {
         console.log("MockSerial port opened");
         callback(null);
     }
-    write(data, callback) {
+
+    write(data: string, callback: (error: any) => void): void {
         console.log(`MockSerial wrote: ${data}`);
         callback(null);
     }
-    close(callback) {
+
+    close(callback: (error: any) => void): void {
         console.log("MockSerial port closed");
         callback(null);
     }
-    on(event, callback) {
+
+    on(event: string, callback: (data: any) => void): void {
         console.log(`MockSerial event ${event} registered`);
     }
 }
-const app = (0, express_1.default)();
+
+const app = express()
 const port = 3000;
-const deviceStates = {
+const deviceStates: IDeviceStates = {
     "1": {
         deviceID: "1",
         OK: false,
@@ -71,15 +108,19 @@ const deviceStates = {
         }
     }
 };
+
 // The Plan
 // 1. Every 10 seconds, send a request to the controller with the desired valve states
 // 2. The controller will respond with DID=[Device ID]&OK=1
 // 3. If the controller does not respond, then send the request again, up to 3 times
 // 4. Go to the next device and repeat
 // 5. If all devices have been sent, then wait 10 seconds and start over
-raspi_1.default.init(() => {
+
+raspi.init(() => {
     let stringData = "";
-    let serial;
+
+    let serial: ISerial;
+
     if (require('os').platform() === 'linux' && (require('os').arch() === 'arm' || require('os').arch() === 'arm64')) {
         // @ts-ignore
         serial = new Serial({
@@ -88,110 +129,137 @@ raspi_1.default.init(() => {
             // @ts-ignore
             parity: Serial.PARITY_NONE
         });
-    }
-    else {
+    } else {
         serial = new MockSerial({
             portId: "/dev/ttyS0",
             baudRate: 9600,
             parity: "none"
-        });
+        })
     }
+
     serial.open(() => {
         serial.on('data', (data) => {
             collectData(data);
         });
     });
+
     app.listen(port, () => {
-        console.log(`Example app listening on port ${port}`);
+        console.log(`Example app listening on port ${port}`)
     });
+
     app.get('/', (req, res) => {
-        res.send('hello world');
+        res.send('hello world')
     });
+
     // send a request for each controller every 10 seconds
     // get the valve states from the schedule
-    setInterval(() => __awaiter(void 0, void 0, void 0, function* () {
+    setInterval(async () => {
         const controllerDeviceIds = Object.keys(deviceStates);
         for (let i = 0; i < controllerDeviceIds.length; i++) {
             const deviceID = controllerDeviceIds[i];
             const deviceState = deviceStates[deviceID];
             deviceState.desiredValveState = { A: false, B: false };
             deviceState.OK = false;
-            // const valveState = getScheduleCommand(deviceID);
-            const valveState = "A";
+
+            const valveState = getScheduleCommand(deviceID);
             if (valveState) {
                 deviceState.desiredValveState[valveState] = true;
             }
+
             // try 1 times to get a response
             for (let j = 0; j < 1; j++) {
-                sendMessage(`|${deviceID}${deviceState.desiredValveState.A ? 1 : 0}${deviceState.desiredValveState.B ? 1 : 0}|`);
-                yield sleep(2000);
+                sendMessage(
+                    `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0
+                    }${deviceState.desiredValveState.B ? 1 : 0}|`
+                );
+
+                await sleep(2000);
+
                 if (deviceState.OK) {
                     console.log("Device " + deviceID + " OK");
                     break;
                 }
-                yield sleep(2000);
+
+                await sleep(2000);
                 console.log("Device " + deviceID + " not OK.");
             }
-            yield sleep(2000);
+
+            await sleep(2000);
         }
+
         console.log("---------");
-    }), 40000);
-    function sendMessage(message) {
+    }, 40000);
+
+    function sendMessage(message: string) {
         console.log("Sending: ", message);
         serial.write(message);
     }
-    function collectData(byteArray) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const byteString = String.fromCharCode(...byteArray);
-            stringData += byteString;
-            if (stringData.includes('|')) {
-                const commandArray = stringData.split('|');
-                const newCommand = commandArray.shift() || "";
-                //   console.log("Full Data: ", newCommand);
-                const commandObject = parseControllerData(newCommand);
-                if (commandObject) {
-                    if (commandObject.OK === '1' && commandObject.DID) {
-                        deviceStates[commandObject.DID].OK = true;
-                    }
+
+    async function collectData(byteArray: number[]) {
+        const byteString = String.fromCharCode(...byteArray);
+        stringData += byteString;
+
+        if (stringData.includes('|')) {
+            const commandArray = stringData.split('|');
+            const newCommand = commandArray.shift() || "";
+
+            //   console.log("Full Data: ", newCommand);
+            const commandObject = parseControllerData(newCommand);
+
+            if (commandObject) {
+                if (commandObject.OK === '1' && commandObject.DID) {
+                    deviceStates[commandObject.DID].OK = true;
                 }
-                stringData = commandArray.join('|');
             }
-        });
+
+            stringData = commandArray.join('|');
+        }
     }
 });
-function sleep(ms) {
+
+function sleep(ms: number) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
     });
 }
-// function getScheduleCommand(deviceID: string) {
-//     const date = new Date();
-//     const adjustedDay = (date.getDay() - 1 + 7) % 7;
-//     const hour = date.getHours();
-//     // add a leading zero to the hour if needed
-//     const time = `${hour < 10 ? '0' : ''}${hour}:00`;
-//     const daySchedule = schedule.days[adjustedDay];
-//     const scheduleCommand = daySchedule.schedule[time as string];
-//     if (!scheduleCommand) {
-//         return false;
-//     }
-//     const commandDeviceID = scheduleCommand[0];
-//     const valveLetter = scheduleCommand[1];
-//     if (deviceID != commandDeviceID) {
-//         return false;
-//     }
-//     return valveLetter;
-// }
+
+function getScheduleCommand(deviceID: string): "A" | "B" | "" {
+    return "";
+    // const date = new Date();
+    // const adjustedDay = (date.getDay() - 1 + 7) % 7;
+    // const hour = date.getHours();
+    // // add a leading zero to the hour if needed
+    // const time = `${hour < 10 ? '0' : ''}${hour}:00`;
+    // const daySchedule = schedule.days[adjustedDay];
+
+    // const scheduleCommand = daySchedule.schedule[time as string];
+    // if (!scheduleCommand) {
+    //     return false;
+    // }
+
+    // const commandDeviceID = scheduleCommand[0];
+    // const valveLetter = scheduleCommand[1];
+
+    // if (deviceID != commandDeviceID) {
+    //     return false;
+    // }
+
+    // return valveLetter;
+}
+
 // function getScheduleCommandTest(deviceID: string) {
 //     const date = new Date();
 //     const adjustedDay = (date.getDay() - 1 + 7) % 7;
 //     const hour = date.getHours();
+
 //     // add a leading zero to the hour if needed
 //     const time = `${hour < 10 ? '0' : ''}${hour}:00`;
 //     const daySchedule = schedule.days[adjustedDay];
 //     const minute = date.getMinutes();
 //     console.log("Minute: ", minute);
+
 //     // every other 7 seconds turn on a different valve
+
 //     // if the deviceID is 1, then turn on valve for every other 7 minutes
 //     if (deviceID === "1" && [0, 7, 14, 21, 28, 35, 42, 49, 56].includes(minute)) {
 //         return 'A';
@@ -206,25 +274,31 @@ function sleep(ms) {
 //     } else if (deviceID == "4" && [6, 13, 20, 27, 34, 41, 48, 55].includes(minute)) {
 //         return 'A';
 //     }
+
 //     return false;
 // }
+
 // Data format: DID=1&TID=-14282&H=50.00&T=69.98&A=1&B=1
-function parseControllerData(data) {
-    const dataObject = {};
+function parseControllerData(data: string) {
+    const dataObject: any = {};
     const dataArray = data.split('&');
     dataArray.forEach((item) => {
         const itemArray = item.split('=');
         dataObject[itemArray[0]] = itemArray[1];
     });
+
     return dataObject;
 }
+
 // Add an event listener for uncaught exceptions
 process.on('uncaughtException', (error) => {
     console.error('Unhandled exception:', error);
+
     // Exit the process with an error code
     process.exit(1);
 });
-const zones = {
+
+const zones: Record<string, IZone> = {
     "1A": {
         name: "Girls Zone (5)",
         type: "pasture",
@@ -268,7 +342,8 @@ const zones = {
         valve: "A",
     }
 };
-const schedule = [
+
+const schedule: ISchedules = [
     {
         name: "Monday",
         schedule: {}
@@ -276,6 +351,7 @@ const schedule = [
     {
         name: "Tuesday",
         schedule: {}
+
     },
     {
         name: "Wednesday",
@@ -298,3 +374,4 @@ const schedule = [
         schedule: {}
     }
 ];
+
