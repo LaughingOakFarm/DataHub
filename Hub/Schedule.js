@@ -179,6 +179,7 @@ raspi.init(() => {
                         DeviceStates_1.deviceStates[commandObject.DID].OK = true;
                     }
                 }
+                removeExpiredOverrides();
                 stringData = commandArray.join('|');
             }
         });
@@ -199,26 +200,26 @@ function saveScheduleFile(schedule) {
         console.log("File has been updated");
     });
 }
-function removeOverrides(schedule) {
+function removeExpiredOverrides() {
     const date = new Date();
     const currentDay = date.getDay();
     const currentHour = date.getHours();
     for (let i = 0; i < 7; i++) {
         if (i === currentDay) {
-            const daySchedule = schedule[currentDay.toString()];
+            const daySchedule = currentSchedule[currentDay.toString()];
             for (let i = 0; i < currentHour; i++) {
                 const hourSchedule = daySchedule.schedule[i.toString()];
                 hourSchedule.overrides = [];
             }
             continue;
         }
-        const daySchedule = schedule[i.toString()];
+        const daySchedule = currentSchedule[i.toString()];
         for (let j = 0; j < 24; j++) {
             const hourSchedule = daySchedule.schedule[j.toString()];
             hourSchedule.overrides = [];
         }
     }
-    saveScheduleFile(schedule);
+    saveScheduleFile(currentSchedule);
 }
 function getScheduleCommand(deviceID) {
     return "";

@@ -178,6 +178,8 @@ raspi.init(() => {
                 }
             }
 
+            removeExpiredOverrides();
+
             stringData = commandArray.join('|');
         }
     }
@@ -201,14 +203,14 @@ function saveScheduleFile(schedule: ISchedule) {
     });
 }
 
-function removeOverrides(schedule: ISchedule) {
+function removeExpiredOverrides() {
     const date = new Date();
     const currentDay = date.getDay();
     const currentHour = date.getHours();
 
     for (let i = 0; i < 7; i++) {
         if (i === currentDay) {
-            const daySchedule = schedule[currentDay.toString() as DayID];
+            const daySchedule = currentSchedule[currentDay.toString() as DayID];
             for (let i = 0; i < currentHour; i++) {
                 const hourSchedule = daySchedule.schedule[i.toString() as TimeID];
                 hourSchedule.overrides = [];
@@ -217,14 +219,14 @@ function removeOverrides(schedule: ISchedule) {
             continue;
         }
 
-        const daySchedule = schedule[i.toString() as DayID];
+        const daySchedule = currentSchedule[i.toString() as DayID];
         for (let j = 0; j < 24; j++) {
             const hourSchedule = daySchedule.schedule[j.toString() as TimeID];
             hourSchedule.overrides = [];
         }
     }
 
-    saveScheduleFile(schedule);
+    saveScheduleFile(currentSchedule);
 }
 
 
