@@ -23,6 +23,7 @@ raspi_1.init(() => {
     let stringData = "";
     let serial;
     if (require('os').platform() === 'linux' && (require('os').arch() === 'arm' || require('os').arch() === 'arm64')) {
+        const Serial = require('raspi-serial').Serial;
         // @ts-ignore
         serial = new Serial({
             portId: "/dev/ttyS0",
