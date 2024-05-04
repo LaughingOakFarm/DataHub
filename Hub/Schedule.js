@@ -49,7 +49,7 @@ if (!fs_1.default.existsSync("schedule.json")) {
     saveScheduleFile(EmptySchedule_1.emptySchedule);
 }
 const currentScheduleRaw = fs_1.default.readFileSync("schedule.json", "utf8");
-const currentSchedule = JSON.parse(currentScheduleRaw) || EmptySchedule_1.emptySchedule;
+let currentSchedule = JSON.parse(currentScheduleRaw) || EmptySchedule_1.emptySchedule;
 raspi.init(() => {
     let stringData = "";
     let serial;
@@ -117,9 +117,17 @@ raspi.init(() => {
         const daySchedule = schedule[day.toString()];
         const hourSchedule = daySchedule.schedule[time.toString()];
         if (isDefault) {
+            if (hourSchedule.default.includes(zone)) {
+                res.send("Zone already exists in default schedule");
+                return;
+            }
             hourSchedule.default.push(zone);
         }
         else {
+            if (hourSchedule.overrides.includes(zone)) {
+                res.send("Zone already exists in overrides");
+                return;
+            }
             hourSchedule.overrides.push(zone);
         }
         saveScheduleFile(schedule);
@@ -182,6 +190,7 @@ function sleep(ms) {
     });
 }
 function saveScheduleFile(schedule) {
+    currentSchedule = schedule;
     fs_1.default.writeFile("schedule.json", JSON.stringify(schedule), (err) => {
         if (err) {
             console.error(err);
@@ -189,6 +198,27 @@ function saveScheduleFile(schedule) {
         }
         console.log("File has been updated");
     });
+}
+function removeOverrides(schedule) {
+    const date = new Date();
+    const currentDay = date.getDay();
+    const currentHour = date.getHours();
+    for (let i = 0; i < 7; i++) {
+        if (i === currentDay) {
+            const daySchedule = schedule[currentDay.toString()];
+            for (let i = 0; i < currentHour; i++) {
+                const hourSchedule = daySchedule.schedule[i.toString()];
+                hourSchedule.overrides = [];
+            }
+            continue;
+        }
+        const daySchedule = schedule[i.toString()];
+        for (let j = 0; j < 24; j++) {
+            const hourSchedule = daySchedule.schedule[j.toString()];
+            hourSchedule.overrides = [];
+        }
+    }
+    saveScheduleFile(schedule);
 }
 function getScheduleCommand(deviceID) {
     return "";
