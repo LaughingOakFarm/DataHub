@@ -45,7 +45,9 @@ const EmptySchedule_1 = require("./EmptySchedule");
 const Zones_1 = require("./Zones");
 const cors_1 = __importDefault(require("cors"));
 const app = (0, express_1.default)();
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: '*'
+}));
 const port = 3000;
 if (!fs_1.default.existsSync("schedule.json")) {
     saveScheduleFile(EmptySchedule_1.emptySchedule);

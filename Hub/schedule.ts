@@ -9,7 +9,9 @@ import { ZoneID, zones } from "./Zones";
 import cors from 'cors';
 
 const app = express()
-app.use(cors());
+app.use(cors({
+    origin: '*'
+}));
 const port = 3000;
 
 if (!fs.existsSync("schedule.json")) {
