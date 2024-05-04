@@ -40,8 +40,12 @@ const raspi = __importStar(require("raspi"));
 const express_1 = __importDefault(require("express"));
 const DeviceStates_1 = require("./DeviceStates");
 const MockSerial_1 = require("./MockSerial");
+const fs_1 = __importDefault(require("fs"));
+const EmptySchedule_1 = require("./EmptySchedule");
+const Zones_1 = require("./Zones");
 const app = (0, express_1.default)();
 const port = 3000;
+const currentSchedule = fs_1.default.readFileSync("schedule.json", "utf8");
 raspi.init(() => {
     let stringData = "";
     let serial;
@@ -75,6 +79,47 @@ raspi.init(() => {
     });
     app.get('/deviceStates', (req, res) => {
         res.send(DeviceStates_1.deviceStates);
+    });
+    app.get('/schedule', (req, res) => {
+        res.send(currentSchedule);
+    });
+    app.get('/create-empty-schedule', (req, res) => {
+        saveScheduleFile(EmptySchedule_1.emptySchedule);
+        res.send(EmptySchedule_1.emptySchedule);
+    });
+    app.get('/set-schedule', (req, res) => {
+        // query params: 
+        // day: string, ex: "0" for Monday
+        // time: string, ex: "12" for noon
+        // zone: string, ex: "A1"
+        // isDefault: boolean, ex: true
+        const day = parseInt(req.query.day, 10);
+        const time = parseInt(req.query.time, 10);
+        const zone = req.query.zone;
+        const isDefault = req.query.isDefault === "true";
+        if (!day || day > 6 || day < 0) {
+            res.send("Day is required");
+            return;
+        }
+        if (!time || time > 23 || time < 0) {
+            res.send("Time is required and must be between 0 and 23");
+            return;
+        }
+        if (!zone || !Zones_1.zones[zone]) {
+            res.send("Zone is required and must be a valid zone");
+            return;
+        }
+        const schedule = JSON.parse(currentSchedule);
+        const daySchedule = schedule[day.toString()];
+        const hourSchedule = daySchedule.schedule[time.toString()];
+        if (isDefault) {
+            hourSchedule.default.push(zone);
+        }
+        else {
+            hourSchedule.overrides.push(zone);
+        }
+        saveScheduleFile(schedule);
+        res.send(schedule);
     });
     // send a request for each controller every 10 seconds
     // get the valve states from the schedule
@@ -130,6 +175,15 @@ raspi.init(() => {
 function sleep(ms) {
     return new Promise((resolve) => {
         setTimeout(resolve, ms);
+    });
+}
+function saveScheduleFile(schedule) {
+    fs_1.default.writeFile("schedule.json", JSON.stringify(schedule), (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        }
+        console.log("File has been created");
     });
 }
 function getScheduleCommand(deviceID) {

@@ -1,4 +1,15 @@
-import { IDeviceStates } from "./Interfaces";
+export interface IDeviceStates {
+    [key: string]: IDeviceState;
+}
+
+export interface IDeviceState {
+    deviceID: string;
+    OK: boolean;
+    desiredValveState: {
+        A: boolean;
+        B: boolean;
+    };
+}
 
 export const deviceStates: IDeviceStates = {
     "1": {

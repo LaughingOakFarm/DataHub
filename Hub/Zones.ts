@@ -1,4 +1,13 @@
-import { IZones } from "./Interfaces";
+export type ZoneID = "1A" | "1B" | "2A" | "2B" | "3A" | "3B" | "4A";
+
+export type IZones = Record<ZoneID, IZone>;
+
+export interface IZone {
+    name: string;
+    type: string;
+    deviceID: number;
+    valve: string;
+}
 
 export const zones: IZones = {
     "1A": {

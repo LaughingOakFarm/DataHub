@@ -1,4 +1,15 @@
-import { ISerial, ISerialOptions } from "./Interfaces";
+export interface ISerialOptions {
+    portId: string;
+    baudRate: number;
+    parity: string;
+}
+
+export interface ISerial {
+    open(callback: (error: any) => void): void;
+    write(data: string, callback?: (error: any) => void): void;
+    close(callback: (error: any) => void): void;
+    on(event: string, callback?: (data: any) => void): void;
+}
 
 export class MockSerial implements ISerial {
     constructor(private options: ISerialOptions) {
