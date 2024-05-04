@@ -6,9 +6,9 @@ import { ISerial, MockSerial } from './MockSerial';
 import fs from 'fs';
 import { ISchedule, emptySchedule, DayID, TimeID } from "./EmptySchedule";
 import { ZoneID, zones } from "./Zones";
+import cors from 'cors';
 
 const app = express()
-const cors = require('cors');
 app.use(cors());
 const port = 3000;
 
