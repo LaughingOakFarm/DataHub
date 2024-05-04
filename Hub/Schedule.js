@@ -102,15 +102,15 @@ raspi.init(() => {
         const zone = req.query.zone;
         const isDefault = req.query.isDefault === "true";
         if (!day || day > 6 || day < 0) {
-            res.send("Day is required");
+            res.json({ error: "Day is required and must be between 0 and 6" });
             return;
         }
         if (!time || time > 23 || time < 0) {
-            res.send("Time is required and must be between 0 and 23");
+            res.json({ error: "Time is required and must be between 0 and 23" });
             return;
         }
         if (!zone || !Zones_1.zones[zone]) {
-            res.send("Zone is required and must be a valid zone");
+            res.json({ error: "Zone is required and must be a valid zone" });
             return;
         }
         const schedule = currentSchedule;
@@ -118,14 +118,14 @@ raspi.init(() => {
         const hourSchedule = daySchedule.schedule[time.toString()];
         if (isDefault) {
             if (hourSchedule.default.includes(zone)) {
-                res.send("Zone already exists in default schedule");
+                res.json({ error: "Zone already exists in default" });
                 return;
             }
             hourSchedule.default.push(zone);
         }
         else {
             if (hourSchedule.overrides.includes(zone)) {
-                res.send("Zone already exists in overrides");
+                res.json({ error: "Zone already exists in overrides" });
                 return;
             }
             hourSchedule.overrides.push(zone);
