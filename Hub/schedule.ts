@@ -1,5 +1,5 @@
 // @ts-ignore
-import raspi from 'raspi';
+import * as raspi from "raspi";
 import express from 'express';
 import { ISerial  } from './Interfaces';
 import { deviceStates } from './DeviceStates';
@@ -14,6 +14,7 @@ raspi.init(() => {
     let serial: ISerial;
 
     if (require('os').platform() === 'linux' && (require('os').arch() === 'arm' || require('os').arch() === 'arm64')) {
+        const Serial = require('raspi-serial').Serial;
         // @ts-ignore
         serial = new Serial({
             portId: "/dev/ttyS0",
