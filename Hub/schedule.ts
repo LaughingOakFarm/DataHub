@@ -172,7 +172,7 @@ raspi.init(() => {
     function fillQueue() {
         const controllerDeviceIds = Object.keys(deviceStates);
 
-        console.log("Filling queue");
+        console.log("\nFilling queue");
         console.log("-------------");
 
         for (let i = 0; i < controllerDeviceIds.length; i++) {
@@ -236,7 +236,6 @@ raspi.init(() => {
           const deviceState = deviceStates[deviceID];
           if (deviceState.OK) {
             clearTimeout(timeout);
-            process.stdout.write(`OK\n`);
             resolve(true);
           } else {
             setTimeout(checkState, 100);  // Check every 100 ms
@@ -261,12 +260,14 @@ raspi.init(() => {
       sendMessage(sendItem.command);
     
       const isOk = await checkDeviceState(sendItem.deviceID);
-      isProcessing = false;
       if (isOk) {
-        processQueue();
+        process.stdout.write(`OK\n`);
       } else {
         process.stdout.write(`NOT OK\n`);
       }
+
+      isProcessing = false;
+      processQueue();
     }
     
     // Start processing queue
