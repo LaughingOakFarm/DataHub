@@ -200,10 +200,6 @@ function sleep(ms: number) {
 }
 
 function saveScheduleFile(schedule: ISchedule) {
-    if(schedule === currentSchedule) {
-        return;
-    }
-
     currentSchedule = schedule;
 
     fs.writeFile("schedule.json", JSON.stringify(schedule), (err) => {
