@@ -137,6 +137,20 @@ raspi.init(() => {
         else {
             hourSchedule.overrides = [zone];
         }
+        // if it is the current day and hour, push the command to the sendQueue
+        const date = new Date();
+        const adjustedDay = (date.getDay() - 1 + 7) % 7;
+        const hour = date.getHours();
+        const deviceID = zone[0];
+        const valveLetter = zone[1];
+        if (day === adjustedDay && time === hour) {
+            const command = `|${deviceID}${valveLetter === 'A' ? '1' : '0'}${valveLetter === 'B' ? '1' : '0'}|`;
+            console.log("Pushing command to sendQueue", command);
+            SendQueue_1.sendQueue.push({
+                deviceID,
+                command
+            });
+        }
         saveScheduleFile(schedule);
         res.send(schedule);
     });
