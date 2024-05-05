@@ -125,18 +125,18 @@ raspi.init(() => {
         const daySchedule = schedule[day.toString()];
         const hourSchedule = daySchedule.schedule[time.toString()];
         if (isDefault) {
-            if (hourSchedule.default.includes(zone)) {
-                res.json({ error: "Zone already exists in default" });
-                return;
-            }
-            hourSchedule.default.push(zone);
+            // if (hourSchedule.default.includes(zone)) {
+            //     res.json({ error: "Zone already exists in default" });
+            //     return;
+            // }
+            hourSchedule.default = [zone];
         }
         else {
-            if (hourSchedule.overrides.includes(zone)) {
-                res.json({ error: "Zone already exists in overrides" });
-                return;
-            }
-            hourSchedule.overrides.push(zone);
+            // if (hourSchedule.overrides.includes(zone)) {
+            //     res.json({ error: "Zone already exists in overrides" });
+            //     return;
+            // }
+            hourSchedule.overrides = [zone];
         }
         saveScheduleFile(schedule);
         res.send(schedule);
