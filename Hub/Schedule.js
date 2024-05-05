@@ -109,15 +109,15 @@ raspi.init(() => {
         const time = parseInt(req.query.time, 10);
         const zone = req.query.zone;
         const isDefault = req.query.isDefault === "true";
-        if (!day || day > 6 || day < 0) {
+        if (day > 6 || day < 0) {
             res.json({ error: "Day is required and must be between 0 and 6" });
             return;
         }
-        if (!time || time > 23 || time < 0) {
+        if (time > 23 || time < 0) {
             res.json({ error: "Time is required and must be between 0 and 23" });
             return;
         }
-        if (!zone || !Zones_1.zones[zone]) {
+        if (!Zones_1.zones[zone]) {
             res.json({ error: "Zone is required and must be a valid zone" });
             return;
         }
