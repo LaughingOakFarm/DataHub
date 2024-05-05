@@ -7,6 +7,8 @@ import fs from 'fs';
 import { ISchedule, emptySchedule, DayID, TimeID } from "./EmptySchedule";
 import { ZoneID, zones } from "./Zones";
 import cors from 'cors';
+import { recentSends } from "./RecentSends";
+import { sendQueue } from "./SendQueue";
 
 const app = express()
 app.use(cors({
@@ -61,11 +63,29 @@ raspi.init(() => {
         res.send(deviceStates);
     });
 
+    app.get('/zones', (req, res) => {
+        res.send(zones);
+    });
+
+    app.get('/schedule', (req, res) => {
+        res.send(currentSchedule);
+    });
+
+    app.get('/recentSends', (req, res) => {
+        res.send(recentSends);
+    });
+
+    app.get('/sendQueue', (req, res) => {
+        res.send(sendQueue);
+    });
+
     app.get('/init', (req, res) => {
         res.send({
             zones,
             deviceStates,
-            schedule: currentSchedule
+            schedule: currentSchedule,
+            recentSends,
+            sendQueue
         });
     });
 
@@ -119,6 +139,7 @@ raspi.init(() => {
     // get the valve states from the schedule
     setInterval(async () => {
         const controllerDeviceIds = Object.keys(deviceStates);
+
         for (let i = 0; i < controllerDeviceIds.length; i++) {
             const deviceID = controllerDeviceIds[i];
             const deviceState = deviceStates[deviceID];
@@ -175,8 +196,6 @@ raspi.init(() => {
                     deviceStates[commandObject.DID].OK = true;
                 }
             }
-
-            // removeExpiredOverrides();
 
             stringData = commandArray.join('|');
         }
