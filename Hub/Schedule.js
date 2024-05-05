@@ -226,23 +226,21 @@ function removeExpiredOverrides() {
     saveScheduleFile(currentSchedule);
 }
 function getScheduleCommand(deviceID) {
-    return "";
-    // const date = new Date();
-    // const adjustedDay = (date.getDay() - 1 + 7) % 7;
-    // const hour = date.getHours();
-    // // add a leading zero to the hour if needed
-    // const time = `${hour < 10 ? '0' : ''}${hour}:00`;
-    // const daySchedule = schedule.days[adjustedDay];
-    // const scheduleCommand = daySchedule.schedule[time as string];
-    // if (!scheduleCommand) {
-    //     return false;
-    // }
-    // const commandDeviceID = scheduleCommand[0];
-    // const valveLetter = scheduleCommand[1];
-    // if (deviceID != commandDeviceID) {
-    //     return false;
-    // }
-    // return valveLetter;
+    const date = new Date();
+    const adjustedDay = (date.getDay() - 1 + 7) % 7;
+    const hour = date.getHours();
+    const daySchedule = currentSchedule[adjustedDay];
+    const scheduleCommand = daySchedule.schedule[hour];
+    const currentCommand = scheduleCommand.overrides[0] || scheduleCommand.default[0];
+    if (!currentCommand) {
+        return "";
+    }
+    const commandDeviceID = currentCommand[0];
+    const valveLetter = currentCommand[1];
+    if (deviceID != commandDeviceID) {
+        return "";
+    }
+    return valveLetter;
 }
 // function getScheduleCommandTest(deviceID: string) {
 //     const date = new Date();
