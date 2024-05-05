@@ -137,6 +137,44 @@ raspi.init(() => {
 
     // send a request for each controller every 10 seconds
     // get the valve states from the schedule
+    // setInterval(async () => {
+    //     const controllerDeviceIds = Object.keys(deviceStates);
+
+    //     for (let i = 0; i < controllerDeviceIds.length; i++) {
+    //         const deviceID = controllerDeviceIds[i];
+    //         const deviceState = deviceStates[deviceID];
+    //         deviceState.desiredValveState = { A: false, B: false };
+    //         deviceState.OK = false;
+
+    //         const valveState = getScheduleCommand(deviceID);
+    //         if (valveState) {
+    //             deviceState.desiredValveState[valveState] = true;
+    //         }
+
+    //         // try 1 times to get a response
+    //         for (let j = 0; j < 1; j++) {
+    //             sendMessage(
+    //                 `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0
+    //                 }${deviceState.desiredValveState.B ? 1 : 0}|`
+    //             );
+
+    //             await sleep(2000);
+
+    //             if (deviceState.OK) {
+    //                 console.log("Device " + deviceID + " OK");
+    //                 break;
+    //             }
+
+    //             await sleep(2000);
+    //             console.log("Device " + deviceID + " not OK.");
+    //         }
+
+    //         await sleep(2000);
+    //     }
+
+    //     console.log("---------");
+    // }, 30000);
+
     setInterval(async () => {
         const controllerDeviceIds = Object.keys(deviceStates);
 
@@ -151,29 +189,95 @@ raspi.init(() => {
                 deviceState.desiredValveState[valveState] = true;
             }
 
-            // try 1 times to get a response
-            for (let j = 0; j < 1; j++) {
-                sendMessage(
-                    `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0
-                    }${deviceState.desiredValveState.B ? 1 : 0}|`
-                );
+            const command = `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0}${deviceState.desiredValveState.B ? 1 : 0}|`;
 
-                await sleep(2000);
+            sendQueue.push({
+                deviceID,
+                command
+            });
 
-                if (deviceState.OK) {
-                    console.log("Device " + deviceID + " OK");
-                    break;
-                }
-
-                await sleep(2000);
-                console.log("Device " + deviceID + " not OK.");
-            }
-
-            await sleep(2000);
+            console.log('Pushed to sendQueue: ', command); 
         }
+    }, 30000);
 
-        console.log("---------");
-    }, 40000);
+    // setInterval(async () => {
+    //     if (sendQueue.length > 0) {
+    //         const sendItem = sendQueue.shift();
+
+    //         if (!sendItem) {
+    //             return;
+    //         }
+
+    //         console.log("Sending: ", sendItem.command);
+    //         sendMessage(sendItem.command);
+
+    //         await sleep(2000);
+
+    //         const deviceState = deviceStates[sendItem.deviceID];
+    //         if (deviceState.OK) {
+    //             console.log("Device " + sendItem.deviceID + " OK");
+    //             return;
+    //         }
+
+    //         console.log("Device " + sendItem.deviceID + " not OK.");
+    //     }
+    // }, 5000);
+
+    let isProcessing = false;
+    
+    function checkDeviceState(deviceID: string) {
+      return new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          console.log("Timeout reached for device", deviceID);
+          resolve(false);  // Resolve as false after 2 seconds
+        }, 2000);
+    
+        const checkState = () => {
+          const deviceState = deviceStates[deviceID];
+          if (deviceState.OK) {
+            clearTimeout(timeout);
+            console.log("Device " + deviceID + " OK");
+            resolve(true);
+          } else {
+            setTimeout(checkState, 100);  // Check every 100 ms
+          }
+        };
+    
+        checkState();
+      });
+    }
+    
+    async function processQueue() {
+      if (isProcessing || sendQueue.length === 0) return;
+    
+      isProcessing = true;
+      const sendItem = sendQueue.shift();
+    
+      if (!sendItem) {
+        isProcessing = false;
+        return;
+      }
+    
+      console.log("Sending: ", sendItem.command);
+      sendMessage(sendItem.command);
+    
+      const isOk = await checkDeviceState(sendItem.deviceID);
+      if (isOk) {
+        // Device is OK, trigger next process
+        console.log("Processing next item immediately after OK");
+        processQueue();
+      } else {
+        // Device not OK or timed out, wait before trying next
+        console.log("Device " + sendItem.deviceID + " not OK, waiting...");
+      }
+    
+      isProcessing = false;
+    }
+    
+    // Start processing queue
+    setInterval(processQueue, 5000);  // This continues to check if it should process the queue
+    
+
 
     function sendMessage(message: string) {
         console.log("Sending: ", message);
