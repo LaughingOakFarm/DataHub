@@ -33,5 +33,21 @@ exports.deviceStates = {
             A: false,
             B: false
         }
-    }
+    },
+    "5": {
+        deviceID: "5",
+        OK: false,
+        desiredValveState: {
+            A: false,
+            B: false
+        }
+    },
+    "6": {
+        deviceID: "6",
+        OK: false,
+        desiredValveState: {
+            A: false,
+            B: false
+        }
+    },
 };

@@ -43,5 +43,17 @@ exports.zones = {
         type: "lawn",
         deviceID: 4,
         valve: "A",
-    }
+    },
+    "5A": {
+        name: "Bottom Zone (4)",
+        type: "lawn",
+        deviceID: 5,
+        valve: "A",
+    },
+    "6A": {
+        name: "Back Lawn (4)",
+        type: "lawn",
+        deviceID: 6,
+        valve: "A",
+    },
 };

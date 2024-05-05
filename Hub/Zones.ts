@@ -1,4 +1,4 @@
-export type ZoneID = "1A" | "1B" | "2A" | "2B" | "3A" | "3B" | "4A";
+export type ZoneID = "1A" | "1B" | "2A" | "2B" | "3A" | "3B" | "4A" | "5A" | "6A";
 
 export type IZones = Record<ZoneID, IZone>;
 
@@ -51,5 +51,17 @@ export const zones: IZones = {
         type: "lawn",
         deviceID: 4,
         valve: "A",
-    }
+    },
+    "5A": {
+        name: "Bottom Zone (4)",
+        type: "lawn",
+        deviceID: 5,
+        valve: "A",
+    },
+    "6A": {
+        name: "Back Lawn (4)",
+        type: "lawn",
+        deviceID: 6,
+        valve: "A",
+    },
 };
