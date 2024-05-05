@@ -4,7 +4,7 @@ export interface IDeviceStates {
 
 export interface IDeviceState {
     deviceID: string;
-    status: string;
+    status: 'active' | 'inactive';
     OK: boolean;
     desiredValveState: {
         A: boolean;
