@@ -175,7 +175,7 @@ raspi.init(() => {
     //     console.log("---------");
     // }, 30000);
 
-    setInterval(async () => {
+    function fillQueue() {
         const controllerDeviceIds = Object.keys(deviceStates);
 
         for (let i = 0; i < controllerDeviceIds.length; i++) {
@@ -198,7 +198,13 @@ raspi.init(() => {
 
             console.log('Pushed to sendQueue: ', command); 
         }
-    }, 30000);
+    }
+
+    fillQueue(); // fill the queue on startup
+
+    setInterval(async () => {
+        fillQueue();
+    }, 30000); // fill the queue every 30 seconds
 
     // setInterval(async () => {
     //     if (sendQueue.length > 0) {
@@ -258,20 +264,16 @@ raspi.init(() => {
         return;
       }
     
-      console.log("Sending: ", sendItem.command);
       sendMessage(sendItem.command);
     
       const isOk = await checkDeviceState(sendItem.deviceID);
+      isProcessing = false;
       if (isOk) {
-        // Device is OK, trigger next process
         console.log("Processing next item immediately after OK");
         processQueue();
       } else {
-        // Device not OK or timed out, wait before trying next
-        console.log("Device " + sendItem.deviceID + " not OK, waiting...");
+        console.log("Device " + sendItem.deviceID + " not OK");
       }
-    
-      isProcessing = false;
     }
     
     // Start processing queue
