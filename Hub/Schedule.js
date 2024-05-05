@@ -117,10 +117,6 @@ raspi.init(() => {
             res.json({ error: "Time is required and must be between 0 and 23" });
             return;
         }
-        if (!Zones_1.zones[zone]) {
-            res.json({ error: "Zone is required and must be a valid zone" });
-            return;
-        }
         const schedule = currentSchedule;
         const daySchedule = schedule[day.toString()];
         const hourSchedule = daySchedule.schedule[time.toString()];
