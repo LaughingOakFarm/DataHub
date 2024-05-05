@@ -121,21 +121,17 @@ raspi.init(() => {
         const daySchedule = schedule[day.toString()];
         const hourSchedule = daySchedule.schedule[time.toString()];
         if (isDefault) {
-            // if (hourSchedule.default.includes(zone)) {
-            //     res.json({ error: "Zone already exists in default" });
-            //     return;
-            // }
             hourSchedule.default = [zone];
         }
         else {
-            // if (hourSchedule.overrides.includes(zone)) {
-            //     res.json({ error: "Zone already exists in overrides" });
-            //     return;
-            // }
             hourSchedule.overrides = [zone];
         }
         saveScheduleFile(schedule);
         res.send(schedule);
+    });
+    app.get('/clear-overrides', (req, res) => {
+        removeExpiredOverrides();
+        res.send(currentSchedule);
     });
     // send a request for each controller every 10 seconds
     // get the valve states from the schedule
@@ -204,27 +200,17 @@ function saveScheduleFile(schedule) {
     });
     console.log("Schedule saved");
 }
-// function removeExpiredOverrides() {
-//     const date = new Date();
-//     const currentDay = date.getDay();
-//     const currentHour = date.getHours();
-//     for (let i = 0; i < 7; i++) {
-//         if (i === currentDay) {
-//             const daySchedule = currentSchedule[currentDay.toString() as DayID];
-//             for (let i = 0; i < currentHour; i++) {
-//                 const hourSchedule = daySchedule.schedule[i.toString() as TimeID];
-//                 hourSchedule.overrides = [];
-//             }
-//             continue;
-//         }
-//         const daySchedule = currentSchedule[i.toString() as DayID];
-//         for (let j = 0; j < 24; j++) {
-//             const hourSchedule = daySchedule.schedule[j.toString() as TimeID];
-//             hourSchedule.overrides = [];
-//         }
-//     }
-//     saveScheduleFile(currentSchedule);
-// }
+function removeExpiredOverrides() {
+    const date = new Date();
+    for (let i = 0; i < 7; i++) {
+        const daySchedule = currentSchedule[i.toString()];
+        for (let j = 0; j < 24; j++) {
+            const hourSchedule = daySchedule.schedule[j.toString()];
+            hourSchedule.overrides = [];
+        }
+    }
+    saveScheduleFile(currentSchedule);
+}
 function getScheduleCommand(deviceID) {
     const date = new Date();
     const adjustedDay = (date.getDay() - 1 + 7) % 7;
