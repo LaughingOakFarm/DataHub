@@ -224,7 +224,6 @@ raspi.init(() => {
     function checkDeviceState(deviceID) {
         return new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
-                console.log("Timeout reached for device", deviceID);
                 resolve(false); // Resolve as false after 2 seconds
             }, 2000);
             const checkState = () => {
@@ -255,7 +254,6 @@ raspi.init(() => {
             const isOk = yield checkDeviceState(sendItem.deviceID);
             isProcessing = false;
             if (isOk) {
-                console.log("Processing next item immediately after OK");
                 processQueue();
             }
             else {
