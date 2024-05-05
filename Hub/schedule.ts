@@ -181,7 +181,7 @@ raspi.init(() => {
                 }
             }
 
-            removeExpiredOverrides();
+            // removeExpiredOverrides();
 
             stringData = commandArray.join('|');
         }
@@ -207,31 +207,31 @@ function saveScheduleFile(schedule: ISchedule) {
     console.log("Schedule saved");
 }
 
-function removeExpiredOverrides() {
-    const date = new Date();
-    const currentDay = date.getDay();
-    const currentHour = date.getHours();
+// function removeExpiredOverrides() {
+//     const date = new Date();
+//     const currentDay = date.getDay();
+//     const currentHour = date.getHours();
 
-    for (let i = 0; i < 7; i++) {
-        if (i === currentDay) {
-            const daySchedule = currentSchedule[currentDay.toString() as DayID];
-            for (let i = 0; i < currentHour; i++) {
-                const hourSchedule = daySchedule.schedule[i.toString() as TimeID];
-                hourSchedule.overrides = [];
-            }
+//     for (let i = 0; i < 7; i++) {
+//         if (i === currentDay) {
+//             const daySchedule = currentSchedule[currentDay.toString() as DayID];
+//             for (let i = 0; i < currentHour; i++) {
+//                 const hourSchedule = daySchedule.schedule[i.toString() as TimeID];
+//                 hourSchedule.overrides = [];
+//             }
 
-            continue;
-        }
+//             continue;
+//         }
 
-        const daySchedule = currentSchedule[i.toString() as DayID];
-        for (let j = 0; j < 24; j++) {
-            const hourSchedule = daySchedule.schedule[j.toString() as TimeID];
-            hourSchedule.overrides = [];
-        }
-    }
+//         const daySchedule = currentSchedule[i.toString() as DayID];
+//         for (let j = 0; j < 24; j++) {
+//             const hourSchedule = daySchedule.schedule[j.toString() as TimeID];
+//             hourSchedule.overrides = [];
+//         }
+//     }
 
-    saveScheduleFile(currentSchedule);
-}
+//     saveScheduleFile(currentSchedule);
+// }
 
 
 function getScheduleCommand(deviceID: string): "A" | "B" | "" {
