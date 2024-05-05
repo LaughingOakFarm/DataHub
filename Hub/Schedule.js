@@ -190,6 +190,9 @@ raspi.init(() => {
         for (let i = 0; i < controllerDeviceIds.length; i++) {
             const deviceID = controllerDeviceIds[i];
             const deviceState = DeviceStates_1.deviceStates[deviceID];
+            if (deviceState.status === "inactive") {
+                continue;
+            }
             deviceState.desiredValveState = { A: false, B: false };
             deviceState.OK = false;
             const valveState = getScheduleCommand(deviceID);
@@ -266,7 +269,7 @@ raspi.init(() => {
         });
     }
     // Start processing queue
-    setInterval(processQueue, 5000); // This continues to check if it should process the queue
+    setInterval(processQueue, 1000); // This continues to check if it should process the queue
     function sendMessage(message) {
         process.stdout.write(`Sending: ${message} ... `);
         serial.write(message);

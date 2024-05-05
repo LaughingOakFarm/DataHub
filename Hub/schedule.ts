@@ -188,6 +188,11 @@ raspi.init(() => {
         for (let i = 0; i < controllerDeviceIds.length; i++) {
             const deviceID = controllerDeviceIds[i];
             const deviceState = deviceStates[deviceID];
+
+            if (deviceState.status === "inactive") {
+                continue;
+            }
+
             deviceState.desiredValveState = { A: false, B: false };
             deviceState.OK = false;
 

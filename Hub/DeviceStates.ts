@@ -4,6 +4,7 @@ export interface IDeviceStates {
 
 export interface IDeviceState {
     deviceID: string;
+    status: string;
     OK: boolean;
     desiredValveState: {
         A: boolean;
@@ -14,6 +15,7 @@ export interface IDeviceState {
 export const deviceStates: IDeviceStates = {
     "1": {
         deviceID: "1",
+        status: "active",
         OK: false,
         desiredValveState: {
             A: false,
@@ -22,6 +24,7 @@ export const deviceStates: IDeviceStates = {
     },
     "2": {
         deviceID: "2",
+        status: "active",
         OK: false,
         desiredValveState: {
             A: false,
@@ -30,6 +33,7 @@ export const deviceStates: IDeviceStates = {
     },
     "3": {
         deviceID: "3",
+        status: "active",
         OK: false,
         desiredValveState: {
             A: false,
@@ -38,6 +42,7 @@ export const deviceStates: IDeviceStates = {
     },
     "4": {
         deviceID: "4",
+        status: "active",
         OK: false,
         desiredValveState: {
             A: false,
@@ -46,6 +51,7 @@ export const deviceStates: IDeviceStates = {
     },
     "5": {
         deviceID: "5",
+        status: "inactive",
         OK: false,
         desiredValveState: {
             A: false,
@@ -54,6 +60,7 @@ export const deviceStates: IDeviceStates = {
     },
     "6": {
         deviceID: "6",
+        status: "inactive",
         OK: false,
         desiredValveState: {
             A: false,
