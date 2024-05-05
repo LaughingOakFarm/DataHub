@@ -172,8 +172,9 @@ raspi.init(() => {
     function fillQueue() {
         const controllerDeviceIds = Object.keys(deviceStates);
 
-        console.log("\nFilling queue");
-        console.log("-------------");
+        console.log("");
+        console.log("Filling queue");
+        console.log("---------------------------");
 
         for (let i = 0; i < controllerDeviceIds.length; i++) {
             const deviceID = controllerDeviceIds[i];
