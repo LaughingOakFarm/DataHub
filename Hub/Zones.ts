@@ -22,6 +22,7 @@ export const zones: IZones = {
         deviceID: 1,
         valve: "B",
     },
+
     "2A": {
         name: "Oak Zone (4)",
         type: "pasture",
@@ -34,6 +35,7 @@ export const zones: IZones = {
         deviceID: 2,
         valve: "B",
     },
+
     "3A": {
         name: "Pond Fill (1)",
         type: "pond",
@@ -46,18 +48,21 @@ export const zones: IZones = {
         deviceID: 3,
         valve: "B",
     },
+
     "4A": {
         name: "Lawn (5)",
         type: "lawn",
         deviceID: 4,
         valve: "A",
     },
+
     "5A": {
         name: "Bottom Zone (4)",
         type: "lawn",
         deviceID: 5,
         valve: "A",
     },
+    
     "6A": {
         name: "Back Lawn (4)",
         type: "lawn",
