@@ -281,7 +281,7 @@ raspi.init(() => {
     }
     
     // Start processing queue
-    setInterval(processQueue, 5000);  // This continues to check if it should process the queue
+    setInterval(processQueue, 1000);  // This continues to check if it should process the queue
     
 
 
