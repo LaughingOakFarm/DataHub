@@ -7,7 +7,6 @@ import fs from 'fs';
 import { ISchedule, emptySchedule, DayID, TimeID } from "./EmptySchedule";
 import { ZoneID, zones } from "./Zones";
 import cors from 'cors';
-import { recentSends } from "./RecentSends";
 import { sendQueue } from "./SendQueue";
 
 const app = express()
@@ -71,10 +70,6 @@ raspi.init(() => {
         res.send(currentSchedule);
     });
 
-    app.get('/recentSends', (req, res) => {
-        res.send(recentSends);
-    });
-
     app.get('/sendQueue', (req, res) => {
         res.send(sendQueue);
     });
@@ -84,7 +79,6 @@ raspi.init(() => {
             zones,
             deviceStates,
             schedule: currentSchedule,
-            recentSends,
             sendQueue
         });
     });
@@ -178,6 +172,8 @@ raspi.init(() => {
     function fillQueue() {
         const controllerDeviceIds = Object.keys(deviceStates);
 
+        console.log("Filling queue");
+
         for (let i = 0; i < controllerDeviceIds.length; i++) {
             const deviceID = controllerDeviceIds[i];
             const deviceState = deviceStates[deviceID];
@@ -195,8 +191,6 @@ raspi.init(() => {
                 deviceID,
                 command
             });
-
-            console.log('Pushed to sendQueue: ', command); 
         }
     }
 

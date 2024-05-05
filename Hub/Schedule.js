@@ -44,7 +44,6 @@ const fs_1 = __importDefault(require("fs"));
 const EmptySchedule_1 = require("./EmptySchedule");
 const Zones_1 = require("./Zones");
 const cors_1 = __importDefault(require("cors"));
-const RecentSends_1 = require("./RecentSends");
 const SendQueue_1 = require("./SendQueue");
 const app = (0, express_1.default)();
 app.use((0, cors_1.default)({
@@ -96,9 +95,6 @@ raspi.init(() => {
     app.get('/schedule', (req, res) => {
         res.send(currentSchedule);
     });
-    app.get('/recentSends', (req, res) => {
-        res.send(RecentSends_1.recentSends);
-    });
     app.get('/sendQueue', (req, res) => {
         res.send(SendQueue_1.sendQueue);
     });
@@ -107,7 +103,6 @@ raspi.init(() => {
             zones: Zones_1.zones,
             deviceStates: DeviceStates_1.deviceStates,
             schedule: currentSchedule,
-            recentSends: RecentSends_1.recentSends,
             sendQueue: SendQueue_1.sendQueue
         });
     });
@@ -182,6 +177,7 @@ raspi.init(() => {
     // }, 30000);
     function fillQueue() {
         const controllerDeviceIds = Object.keys(DeviceStates_1.deviceStates);
+        console.log("Filling queue");
         for (let i = 0; i < controllerDeviceIds.length; i++) {
             const deviceID = controllerDeviceIds[i];
             const deviceState = DeviceStates_1.deviceStates[deviceID];
@@ -196,7 +192,6 @@ raspi.init(() => {
                 deviceID,
                 command
             });
-            console.log('Pushed to sendQueue: ', command);
         }
     }
     fillQueue(); // fill the queue on startup

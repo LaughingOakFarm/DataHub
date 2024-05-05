@@ -1,5 +1,3 @@
-import { ISend } from "./RecentSends";
-
 export type ISendQueue = ISendQueueItem[];
 
 export interface ISendQueueItem {
