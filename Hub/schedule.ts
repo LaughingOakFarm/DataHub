@@ -61,8 +61,12 @@ raspi.init(() => {
         res.send(deviceStates);
     });
 
-    app.get('/schedule', (req, res) => {
-        res.send(currentSchedule);
+    app.get('/init', (req, res) => {
+        res.send({
+            zones,
+            deviceStates,
+            schedule: currentSchedule
+        });
     });
 
     app.get('/create-empty-schedule', (req, res) => {
