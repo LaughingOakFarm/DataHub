@@ -2,6 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.zones = void 0;
 exports.zones = {
+    "0A": {
+        name: "Don't Run",
+        type: "",
+        deviceID: 0,
+        valve: "A",
+    },
     "1A": {
         name: "Girls Zone (5)",
         type: "pasture",
