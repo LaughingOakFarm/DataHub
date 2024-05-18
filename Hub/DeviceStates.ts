@@ -9,6 +9,10 @@ export interface IDeviceState {
     desiredValveState: {
         A: boolean;
         B: boolean;
+        C: boolean;
+        D: boolean;
+        E: boolean;
+        F: boolean;
     };
 }
 
@@ -19,7 +23,11 @@ export const deviceStates: IDeviceStates = {
         OK: false,
         desiredValveState: {
             A: false,
-            B: false
+            B: false,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "2": {
@@ -28,7 +36,11 @@ export const deviceStates: IDeviceStates = {
         OK: false,
         desiredValveState: {
             A: false,
-            B: false
+            B: false,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "3": {
@@ -37,7 +49,11 @@ export const deviceStates: IDeviceStates = {
         OK: false,
         desiredValveState: {
             A: false,
-            B: false
+            B: false,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "4": {
@@ -46,25 +62,24 @@ export const deviceStates: IDeviceStates = {
         OK: false,
         desiredValveState: {
             A: false,
-            B: false
+            B: false,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "5": {
         deviceID: "5",
-        status: "inactive",
+        status: "active",
         OK: false,
         desiredValveState: {
             A: false,
-            B: false
+            B: false,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
-    },
-    "6": {
-        deviceID: "6",
-        status: "inactive",
-        OK: false,
-        desiredValveState: {
-            A: false,
-            B: false
-        }
-    },
+    }
 };

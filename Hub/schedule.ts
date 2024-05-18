@@ -193,7 +193,7 @@ raspi.init(() => {
                 continue;
             }
 
-            deviceState.desiredValveState = { A: false, B: false };
+            deviceState.desiredValveState = { A: false, B: false, C: false, D: false, E: false, F: false};
             deviceState.OK = false;
 
             const valveState = getScheduleCommand(deviceID);
@@ -201,7 +201,7 @@ raspi.init(() => {
                 deviceState.desiredValveState[valveState] = true;
             }
 
-            const command = `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0}${deviceState.desiredValveState.B ? 1 : 0}|`;
+            const command = `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0}${deviceState.desiredValveState.B ? 1 : 0}${deviceState.desiredValveState.C ? 1 : 0}${deviceState.desiredValveState.D ? 1 : 0}${deviceState.desiredValveState.E ? 1 : 0}${deviceState.desiredValveState.F ? 1 : 0}|`;
 
             sendQueue.push({
                 deviceID,
@@ -351,7 +351,7 @@ function removeExpiredOverrides() {
 }
 
 
-function getScheduleCommand(deviceID: string): "A" | "B" | "" {
+function getScheduleCommand(deviceID: string): "A" | "B" | "C" | "D" | "E" | "F" | "" {
     const date = new Date();
     const adjustedDay = (date.getDay() - 1 + 7) % 7;
     const hour = date.getHours();
@@ -365,7 +365,7 @@ function getScheduleCommand(deviceID: string): "A" | "B" | "" {
     }
 
     const commandDeviceID = currentCommand[0];
-    const valveLetter = currentCommand[1] as "A" | "B";
+    const valveLetter = currentCommand[1] as "A" | "B" | "C" | "D" | "E" | "F";
 
     if (deviceID != commandDeviceID) {
         return "";

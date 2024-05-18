@@ -193,13 +193,13 @@ raspi.init(() => {
             if (deviceState.status === "inactive") {
                 continue;
             }
-            deviceState.desiredValveState = { A: false, B: false };
+            deviceState.desiredValveState = { A: false, B: false, C: false, D: false, E: false, F: false };
             deviceState.OK = false;
             const valveState = getScheduleCommand(deviceID);
             if (valveState) {
                 deviceState.desiredValveState[valveState] = true;
             }
-            const command = `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0}${deviceState.desiredValveState.B ? 1 : 0}|`;
+            const command = `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0}${deviceState.desiredValveState.B ? 1 : 0}${deviceState.desiredValveState.C ? 1 : 0}${deviceState.desiredValveState.D ? 1 : 0}${deviceState.desiredValveState.E ? 1 : 0}${deviceState.desiredValveState.F ? 1 : 0}|`;
             SendQueue_1.sendQueue.push({
                 deviceID,
                 command
