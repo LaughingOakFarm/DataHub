@@ -201,7 +201,28 @@ raspi.init(() => {
                 deviceState.desiredValveState[valveState] = true;
             }
 
-            const command = `|${deviceID}${deviceState.desiredValveState.A ? 1 : 0}${deviceState.desiredValveState.B ? 1 : 0}${deviceState.desiredValveState.C ? 1 : 0}${deviceState.desiredValveState.D ? 1 : 0}${deviceState.desiredValveState.E ? 1 : 0}${deviceState.desiredValveState.F ? 1 : 0}|`;
+            let command = '|';
+            command += deviceID;
+            command += deviceState.desiredValveState.A ? 1 : 0;
+            command += deviceState.desiredValveState.B ? 1 : 0;
+
+            if (deviceState.desiredValveState.C !== null) {
+                command += deviceState.desiredValveState.C ? 1 : 0;
+            }
+
+            if (deviceState.desiredValveState.D !== null) {
+                command += deviceState.desiredValveState.D ? 1 : 0;
+            }
+
+            if (deviceState.desiredValveState.E !== null) {
+                command += deviceState.desiredValveState.E ? 1 : 0;
+            }
+
+            if (deviceState.desiredValveState.F !== null) {
+                command += deviceState.desiredValveState.F ? 1 : 0;
+            }
+
+            command += '|';
 
             sendQueue.push({
                 deviceID,

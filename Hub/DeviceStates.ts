@@ -7,12 +7,12 @@ export interface IDeviceState {
     status: 'active' | 'inactive';
     OK: boolean;
     desiredValveState: {
-        A: boolean;
-        B: boolean;
-        C: boolean;
-        D: boolean;
-        E: boolean;
-        F: boolean;
+        A: boolean | null;
+        B: boolean | null;
+        C: boolean | null;
+        D: boolean | null;
+        E: boolean | null;
+        F: boolean | null;
     };
 }
 
@@ -24,10 +24,10 @@ export const deviceStates: IDeviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: false,
-            D: false,
-            E: false,
-            F: false
+            C: null,
+            D: null,
+            E: null,
+            F: null
         }
     },
     "2": {
@@ -37,10 +37,10 @@ export const deviceStates: IDeviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: false,
-            D: false,
-            E: false,
-            F: false
+            C: null,
+            D: null,
+            E: null,
+            F: null
         }
     },
     "3": {
@@ -50,10 +50,10 @@ export const deviceStates: IDeviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: false,
-            D: false,
-            E: false,
-            F: false
+            C: null,
+            D: null,
+            E: null,
+            F: null
         }
     },
     "4": {
@@ -63,10 +63,10 @@ export const deviceStates: IDeviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: false,
-            D: false,
-            E: false,
-            F: false
+            C: null,
+            D: null,
+            E: null,
+            F: null
         }
     },
     "5": {
@@ -77,9 +77,9 @@ export const deviceStates: IDeviceStates = {
             A: false,
             B: false,
             C: false,
-            D: false,
-            E: false,
-            F: false
+            D: null,
+            E: null,
+            F: null
         }
     }
 };

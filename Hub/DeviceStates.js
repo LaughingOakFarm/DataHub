@@ -9,10 +9,10 @@ exports.deviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: false,
-            D: false,
-            E: false,
-            F: false
+            C: null,
+            D: null,
+            E: null,
+            F: null
         }
     },
     "2": {
@@ -22,10 +22,10 @@ exports.deviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: false,
-            D: false,
-            E: false,
-            F: false
+            C: null,
+            D: null,
+            E: null,
+            F: null
         }
     },
     "3": {
@@ -35,10 +35,10 @@ exports.deviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: false,
-            D: false,
-            E: false,
-            F: false
+            C: null,
+            D: null,
+            E: null,
+            F: null
         }
     },
     "4": {
@@ -48,10 +48,10 @@ exports.deviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: false,
-            D: false,
-            E: false,
-            F: false
+            C: null,
+            D: null,
+            E: null,
+            F: null
         }
     },
     "5": {
@@ -62,9 +62,9 @@ exports.deviceStates = {
             A: false,
             B: false,
             C: false,
-            D: false,
-            E: false,
-            F: false
+            D: null,
+            E: null,
+            F: null
         }
     }
 };
