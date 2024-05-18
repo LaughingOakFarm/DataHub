@@ -9,10 +9,18 @@ exports.deviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: null,
-            D: null,
-            E: null,
-            F: null
+            C: false,
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "2": {
@@ -22,10 +30,18 @@ exports.deviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: null,
-            D: null,
-            E: null,
-            F: null
+            C: false,
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "3": {
@@ -35,10 +51,18 @@ exports.deviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: null,
-            D: null,
-            E: null,
-            F: null
+            C: false,
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "4": {
@@ -48,10 +72,18 @@ exports.deviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: null,
-            D: null,
-            E: null,
-            F: null
+            C: false,
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "5": {
@@ -62,9 +94,17 @@ exports.deviceStates = {
             A: false,
             B: false,
             C: false,
-            D: null,
-            E: null,
-            F: null
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: true,
+            D: false,
+            E: false,
+            F: false
         }
     }
 };

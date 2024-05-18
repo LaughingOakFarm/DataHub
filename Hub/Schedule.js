@@ -198,20 +198,39 @@ raspi.init(() => {
             if (valveState) {
                 deviceState.desiredValveState[valveState] = true;
             }
+            // Reset valve states
+            if (deviceState.activeValves.A) {
+                deviceState.desiredValveState.A = false;
+            }
+            if (deviceState.activeValves.B) {
+                deviceState.desiredValveState.B = false;
+            }
+            if (deviceState.activeValves.C) {
+                deviceState.desiredValveState.C = false;
+            }
+            if (deviceState.activeValves.D) {
+                deviceState.desiredValveState.D = false;
+            }
+            if (deviceState.activeValves.E) {
+                deviceState.desiredValveState.E = false;
+            }
+            if (deviceState.activeValves.F) {
+                deviceState.desiredValveState.F = false;
+            }
             let command = '|';
             command += deviceID;
             command += deviceState.desiredValveState.A ? 1 : 0;
             command += deviceState.desiredValveState.B ? 1 : 0;
-            if (deviceState.desiredValveState.C !== null) {
+            if (deviceState.activeValves.C) {
                 command += deviceState.desiredValveState.C ? 1 : 0;
             }
-            if (deviceState.desiredValveState.D !== null) {
+            if (deviceState.activeValves.D) {
                 command += deviceState.desiredValveState.D ? 1 : 0;
             }
-            if (deviceState.desiredValveState.E !== null) {
+            if (deviceState.activeValves.E) {
                 command += deviceState.desiredValveState.E ? 1 : 0;
             }
-            if (deviceState.desiredValveState.F !== null) {
+            if (deviceState.activeValves.F) {
                 command += deviceState.desiredValveState.F ? 1 : 0;
             }
             command += '|';

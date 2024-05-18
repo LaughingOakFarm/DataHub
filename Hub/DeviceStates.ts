@@ -7,12 +7,20 @@ export interface IDeviceState {
     status: 'active' | 'inactive';
     OK: boolean;
     desiredValveState: {
-        A: boolean | null;
-        B: boolean | null;
-        C: boolean | null;
-        D: boolean | null;
-        E: boolean | null;
-        F: boolean | null;
+        A: boolean;
+        B: boolean;
+        C: boolean;
+        D: boolean;
+        E: boolean;
+        F: boolean;
+    };
+    activeValves: {
+        A: boolean;
+        B: boolean;
+        C: boolean;
+        D: boolean;
+        E: boolean;
+        F: boolean;
     };
 }
 
@@ -24,10 +32,18 @@ export const deviceStates: IDeviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: null,
-            D: null,
-            E: null,
-            F: null
+            C: false,
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "2": {
@@ -37,10 +53,18 @@ export const deviceStates: IDeviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: null,
-            D: null,
-            E: null,
-            F: null
+            C: false,
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "3": {
@@ -50,10 +74,18 @@ export const deviceStates: IDeviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: null,
-            D: null,
-            E: null,
-            F: null
+            C: false,
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "4": {
@@ -63,10 +95,18 @@ export const deviceStates: IDeviceStates = {
         desiredValveState: {
             A: false,
             B: false,
-            C: null,
-            D: null,
-            E: null,
-            F: null
+            C: false,
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: false,
+            D: false,
+            E: false,
+            F: false
         }
     },
     "5": {
@@ -77,9 +117,17 @@ export const deviceStates: IDeviceStates = {
             A: false,
             B: false,
             C: false,
-            D: null,
-            E: null,
-            F: null
+            D: false,
+            E: false,
+            F: false
+        },
+        activeValves: {
+            A: true,
+            B: true,
+            C: true,
+            D: false,
+            E: false,
+            F: false
         }
     }
 };
