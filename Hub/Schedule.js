@@ -193,11 +193,6 @@ raspi.init(() => {
             if (deviceState.status === "inactive") {
                 continue;
             }
-            deviceState.OK = false;
-            const valveState = getScheduleCommand(deviceID);
-            if (valveState) {
-                deviceState.desiredValveState[valveState] = true;
-            }
             // Reset valve states
             if (deviceState.activeValves.A) {
                 deviceState.desiredValveState.A = false;
@@ -216,6 +211,11 @@ raspi.init(() => {
             }
             if (deviceState.activeValves.F) {
                 deviceState.desiredValveState.F = false;
+            }
+            deviceState.OK = false;
+            const valveState = getScheduleCommand(deviceID);
+            if (valveState) {
+                deviceState.desiredValveState[valveState] = true;
             }
             let command = '|';
             command += deviceID;
