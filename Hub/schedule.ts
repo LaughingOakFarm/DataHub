@@ -121,13 +121,13 @@ raspi.init(() => {
         }
 
         // if it is the current day and hour, push the command to the sendQueue
-        // const date = new Date();
-        // const adjustedDay = (date.getDay() - 1 + 7) % 7;
-        // const hour = date.getHours();
+        const date = new Date();
+        const adjustedDay = (date.getDay() - 1 + 7) % 7;
+        const hour = date.getHours();
 
-        // if (day === adjustedDay && time === hour) {
-        //    fillQueue();
-        // }
+        if (day === adjustedDay && time === hour) {
+           fillQueue();
+        }
 
         saveScheduleFile(schedule);
         res.send(schedule);
@@ -259,7 +259,7 @@ raspi.init(() => {
 
     setInterval(async () => {
         fillQueue();
-    }, 30000); // fill the queue every 30 seconds
+    }, 60000); // fill the queue every 30 seconds
 
     // setInterval(async () => {
     //     if (sendQueue.length > 0) {
