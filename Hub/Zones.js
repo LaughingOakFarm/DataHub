@@ -20,18 +20,6 @@ exports.zones = {
         deviceID: 1,
         valve: "B",
     },
-    "2A": {
-        name: "Oak Zone (4)",
-        type: "pasture",
-        deviceID: 2,
-        valve: "A",
-    },
-    "2B": {
-        name: "Boys Zone (3)",
-        type: "pasture",
-        deviceID: 2,
-        valve: "B",
-    },
     "3A": {
         name: "Pond Fill (1)",
         type: "pond",
