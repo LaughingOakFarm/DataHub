@@ -64,19 +64,19 @@ export const zones: IZones = {
     },
 
     "5A": {
-        name: "Oak Zone (4) [v2]",
+        name: "Oak Zone (4)",
         type: "pasture",
         deviceID: 5,
         valve: "A",
     },
     "5B": {
-        name: "Boys Zone (3) [v2]",
+        name: "Boys Zone (3)",
         type: "pasture",
         deviceID: 5,
         valve: "B",
     },
     "5C": {
-        name: "Bottom Zone (4) [v2]",
+        name: "Bottom Zone (4)",
         type: "lawn",
         deviceID: 5,
         valve: "C",
