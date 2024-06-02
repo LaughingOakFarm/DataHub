@@ -25,7 +25,7 @@ exports.deviceStates = {
     },
     "2": {
         deviceID: "2",
-        status: "active",
+        status: "inactive",
         OK: false,
         desiredValveState: {
             A: false,
@@ -36,8 +36,8 @@ exports.deviceStates = {
             F: false
         },
         activeValves: {
-            A: true,
-            B: true,
+            A: false,
+            B: false,
             C: false,
             D: false,
             E: false,
